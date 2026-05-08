@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { brand } from "../_shared/brand.ts";
 
 type BookingIcalRow = {
   id: string;
@@ -36,27 +37,30 @@ Deno.serve(async (req) => {
     const dtstart = toIcalDateTime(b.booking_date, b.start_time);
     const dtend = toIcalDateTime(b.booking_date, b.end_time);
     const treatmentName = b.booking_treatments?.name ?? "Behandling";
-    const uid = `${b.id}@hudfix.se`;
+    const uid = `${b.id}@${brand.domain}`;
 
     return [
       "BEGIN:VEVENT",
       `UID:${uid}`,
       `DTSTAMP:${now}`,
-      `DTSTART:${dtstart}`,
-      `DTEND:${dtend}`,
-      `SUMMARY:${treatmentName} – ${b.customer_name}`,
-      `DESCRIPTION:Behandling: ${treatmentName}\\nKund: ${b.customer_name}`,
+      `DTSTART;TZID=Europe/Stockholm:${dtstart}`,
+      `DTEND;TZID=Europe/Stockholm:${dtend}`,
+      `SUMMARY:${icalEscape(`${treatmentName} – ${b.customer_name}`)}`,
+      `DESCRIPTION:${icalEscape(`Behandling: ${treatmentName}\nKund: ${b.customer_name}`)}`,
       "END:VEVENT",
     ].join("\r\n");
   });
 
+  const calName = `${brand.name} Bokningar`;
+  const fileSafe = brand.domain.replace(/[^a-z0-9.-]/gi, "-");
+
   const ical = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Hudfix//Bokningar//SV",
+    `PRODID:-//${brand.name}//Bokningar//SV`,
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
-    "X-WR-CALNAME:Hudfix Bokningar",
+    `X-WR-CALNAME:${icalEscape(calName)}`,
     "X-WR-TIMEZONE:Europe/Stockholm",
     ...events,
     "END:VCALENDAR",
@@ -65,7 +69,7 @@ Deno.serve(async (req) => {
   return new Response(ical, {
     headers: {
       "Content-Type": "text/calendar; charset=utf-8",
-      "Content-Disposition": 'attachment; filename="hudfix-bokningar.ics"',
+      "Content-Disposition": `attachment; filename="${fileSafe}-bokningar.ics"`,
     },
   });
 });
@@ -77,6 +81,14 @@ function formatIcalDate(d: Date): string {
 function toIcalDateTime(date: string, time: string): string {
   const [y, mo, day] = date.split("-");
   const [h, m] = time.split(":");
-  // Sweden is UTC+1/+2 — store as floating local time
+  // Lokal tid (Europe/Stockholm) — TZID sätts på DTSTART/DTEND-raden.
   return `${y}${mo}${day}T${h}${m}00`;
+}
+
+function icalEscape(s: string): string {
+  return s
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\n/g, "\\n");
 }

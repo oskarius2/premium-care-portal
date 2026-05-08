@@ -1,33 +1,39 @@
 /**
- * Kontaktuppgifter och öppettider — fylla i innan lansering.
- * Med null för telefon/e-post blir länkar inaktiva (text visas ändå).
+ * Kontaktuppgifter och öppettider.
+ *
+ * För närvarande är endast besöksadressen ifylld. Telefon, e-post och
+ * öppettider hålls som `null` / tomma strängar — UI visar då fallback-text
+ * och länkar inaktiveras automatiskt (se `TelLink` / `MailLink`).
  */
 export const siteContact = {
   /** Visas i rubriker, meta m.m. */
-  city: "TODO: ort",
+  city: "Östersund",
 
-  phoneDisplay: "TODO: telefonnummer",
+  // Telefon — fylls i senare. När phoneTel är null blir tel:-länkar inaktiva.
+  phoneDisplay: "",
   /** E.164 utan mellanslag, t.ex. "+46701234567" — aktiverar tel:-länkar */
   phoneTel: null as string | null,
 
-  emailDisplay: "TODO: e-postadress",
+  // E-post — fylls i senare. När emailAddress är null blir mailto:-länkar inaktiva.
+  emailDisplay: "",
   /** Full adress för mailto — aktiverar e-postlänkar */
   emailAddress: null as string | null,
   /** Rad under e-post på kontaktsidan */
-  emailReplyHint: "TODO: svarstid (t.ex. vardagar inom 24 h)",
+  emailReplyHint: "",
 
-  addressStreet: "TODO: gatuadress",
-  addressPostalLine: "TODO: postnummer och ort",
+  addressStreet: "Rådhusgatan 64",
+  addressPostalLine: "831 34 Östersund",
   /** En rad (footer, kompakt) */
-  addressOneLine: "TODO: besöksadress",
+  addressOneLine: "Rådhusgatan 64, 831 34 Östersund",
 
-  openingHoursWeekdays: "TODO: mån–fre",
-  openingHoursSaturday: "TODO: lördag",
-  openingHoursSunday: "TODO: söndag",
+  // Öppettider — fylls i senare.
+  openingHoursWeekdays: "",
+  openingHoursSaturday: "",
+  openingHoursSunday: "",
   /** Rad under telefon på kontaktkort */
-  openingHoursSummary: "TODO: öppettider",
+  openingHoursSummary: "",
   /** Kort rad på startsidan (t.ex. "Öppet vardagar …") */
-  openingHoursHeroLine: "TODO: öppettider",
+  openingHoursHeroLine: "",
 
   /** iframe src eller tom tills adress/karta finns */
   mapEmbedUrl: null as string | null,

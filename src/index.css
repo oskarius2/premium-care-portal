@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Novum Estetik — ren medicinsk skönhetsklinik: lugn neutral bas,
+/* Novum — ren medicinsk skönhetsklinik: lugn neutral bas,
    tydlig typografi, inga onödiga effekter. */
 
 @layer base {
@@ -67,6 +67,12 @@
     letter-spacing: -0.011em;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    /* Förhindra horisontell scroll på små skärmar pga av decorativa absolute-element. */
+    overflow-x: hidden;
+  }
+
+  html {
+    overflow-x: hidden;
   }
 
   @media (min-width: 768px) {
@@ -94,23 +100,23 @@
 
 @layer components {
   .container-page {
-    @apply mx-auto w-full max-w-6xl px-5 md:px-8;
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6 md:px-8;
   }
 
   .container-wide {
-    @apply mx-auto w-full max-w-[1280px] px-6 md:px-10 lg:px-12;
+    @apply mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-10 lg:px-12;
   }
 
   .container-narrow {
-    @apply mx-auto w-full max-w-[1152px] px-6 md:px-10;
+    @apply mx-auto w-full max-w-[1152px] px-4 sm:px-6 md:px-10;
   }
 
   .section-y {
-    @apply py-20 md:py-28 lg:py-40;
+    @apply py-14 sm:py-20 md:py-28 lg:py-40;
   }
 
   .section-y-sm {
-    @apply py-16 md:py-24 lg:py-28;
+    @apply py-12 sm:py-16 md:py-24 lg:py-28;
   }
 
   .hairline {
@@ -186,12 +192,12 @@
 
   /** Header / verktygsrad — något tätare än standard */
   .btn-compact {
-    @apply text-[0.8125rem] md:text-sm px-6 py-2.5 min-h-[44px] md:min-h-[46px] md:px-7 md:py-2.5 tracking-[0.03em] rounded-2xl;
+    @apply text-[0.78rem] sm:text-[0.8125rem] md:text-sm px-4 sm:px-6 py-2.5 min-h-[44px] md:min-h-[46px] md:px-7 md:py-2.5 tracking-[0.03em] rounded-2xl;
   }
 
   /** Två knappar bredvid varandra i kort (behandlingslista) */
   .btn-card-pair {
-    @apply flex-1 min-w-0 justify-center text-[0.97rem] px-5 py-3.5 min-h-[54px] tracking-[0.03em] rounded-2xl;
+    @apply flex-1 min-w-0 justify-center text-[0.93rem] sm:text-[0.97rem] px-4 sm:px-5 py-3.5 min-h-[52px] sm:min-h-[54px] tracking-[0.03em] rounded-2xl;
   }
 
   /** Primär sektion med mörk bakgrund — ljus fylld CTA */
@@ -253,11 +259,11 @@
   }
 
   .heading-xl {
-    @apply font-serif text-[2.35rem] sm:text-5xl md:text-6xl lg:text-7xl font-medium leading-[1.08] sm:leading-[1.05] tracking-tight;
+    @apply font-serif text-[2.05rem] xs:text-[2.35rem] sm:text-5xl md:text-6xl lg:text-7xl font-medium leading-[1.1] sm:leading-[1.05] tracking-tight;
   }
 
   .heading-lg {
-    @apply font-serif text-[1.9rem] sm:text-4xl md:text-5xl font-medium leading-[1.15] sm:leading-[1.12] md:leading-[1.15] tracking-tight;
+    @apply font-serif text-[1.7rem] xs:text-[1.9rem] sm:text-4xl md:text-5xl font-medium leading-[1.18] sm:leading-[1.12] md:leading-[1.15] tracking-tight;
   }
 
   .heading-md {
@@ -265,7 +271,7 @@
   }
 
   .lead {
-    @apply text-base sm:text-lg md:text-[1.125rem] text-muted-foreground leading-relaxed font-normal;
+    @apply text-[0.975rem] sm:text-lg md:text-[1.125rem] text-muted-foreground leading-relaxed font-normal;
   }
 
   .eyebrow {
@@ -280,6 +286,16 @@
   @keyframes fadeUp {
     from { opacity: 0; }
     to { opacity: 1; }
+  }
+
+  /* Touch-säker hit-area för länkar/knappar i textflöden */
+  .tap-target {
+    @apply min-h-[44px] inline-flex items-center;
+  }
+
+  /* Förhindra automatiskt iOS-zoom på små inputs */
+  .no-ios-zoom {
+    font-size: 16px;
   }
 }
 

@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { brand } from "../_shared/brand.ts";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -17,6 +18,13 @@ type InsertBookingRow = {
   status: "confirmed";
 };
 
+const pad = (n: number) => String(n).padStart(2, "0");
+const toMin = (t: string) => {
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + m;
+};
+const toTime = (mm: number) => `${pad(Math.floor(mm / 60))}:${pad(mm % 60)}`;
+
 /* create-booking
    Stöder två lägen:
      1) Enskild bokning (legacy):    { treatment_id, booking_date, start_time, ... }
@@ -25,7 +33,7 @@ type InsertBookingRow = {
           databas-rad per behandling med på varandra följande tider så
           slot-search ser hela blocket som upptaget.
    Klienten anropar create-booking en gång per "besök" så flera separata
-   bes\u00f6k blir flera anrop \u2013 inte detta endpoints ansvar att kedja samman dem. */
+   besök blir flera anrop – inte detta endpoints ansvar att kedja samman dem. */
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
@@ -50,6 +58,14 @@ Deno.serve(async (req) => {
       return json({ error: "Missing required fields" }, 400);
     }
 
+    // Grundvalidering av format så vi inte gör onödig DB-trafik
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(booking_date)) {
+      return json({ error: "Ogiltigt datumformat" }, 400);
+    }
+    if (!/^\d{2}:\d{2}(:\d{2})?$/.test(start_time)) {
+      return json({ error: "Ogiltigt tidsformat" }, 400);
+    }
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
@@ -71,12 +87,47 @@ Deno.serve(async (req) => {
     const totalDuration = treatments.reduce((sum, t) => sum + t.duration_minutes, 0);
 
     // Total slut-tid för konfliktcheck
-    const [h, m] = start_time.split(":").map(Number);
-    const startMin = h * 60 + m;
+    const startMin = toMin(start_time);
     const endMin = startMin + totalDuration;
-    const pad = (n: number) => String(n).padStart(2, "0");
-    const toTime = (mm: number) => `${pad(Math.floor(mm / 60))}:${pad(mm % 60)}`;
     const overall_end = toTime(endMin);
+
+    // ── Server-side validering: tiden måste rymmas inom en availability_rule
+    //    och får inte överlappa blocked_times. Detta dubblerar logiken i
+    //    get-available-slots så att en illvillig eller buggig klient inte kan
+    //    POSTa en bokning utanför öppettiderna.
+    const dayOfWeek = new Date(booking_date + "T12:00:00Z").getDay() || 7;
+
+    const { data: rules } = await supabase
+      .from("availability_rules")
+      .select("start_time, end_time")
+      .eq("day_of_week", dayOfWeek);
+
+    const fitsInARule = (rules ?? []).some((r) => {
+      const ws = toMin(r.start_time);
+      const we = toMin(r.end_time);
+      return startMin >= ws && endMin <= we;
+    });
+
+    if (!fitsInARule) {
+      return json({ error: "Tiden ligger utanför öppettiderna" }, 409);
+    }
+
+    const { data: blocked } = await supabase
+      .from("blocked_times")
+      .select("start_time, end_time, all_day")
+      .eq("blocked_date", booking_date);
+
+    const overlapsBlocked = (blocked ?? []).some((b) => {
+      if (b.all_day) return true;
+      if (!b.start_time || !b.end_time) return false;
+      const bs = toMin(b.start_time);
+      const be = toMin(b.end_time);
+      return startMin < be && endMin > bs;
+    });
+
+    if (overlapsBlocked) {
+      return json({ error: "Tiden är spärrad" }, 409);
+    }
 
     // Konfliktkontroll mot hela blocket
     const { data: conflicts } = await supabase
@@ -122,35 +173,46 @@ Deno.serve(async (req) => {
       return json({ error: "Kunde inte skapa bokning" }, 500);
     }
 
-    // Bekräftelsemail – en mail per besök, lista alla behandlingar
+    // Bekräftelsemail – en mail per besök, lista alla behandlingar.
+    // Slår vi ut på Resend ska bokningen ändå räknas som skapad.
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
     if (RESEND_API_KEY) {
-      const dateFormatted = new Date(booking_date + "T12:00:00Z").toLocaleDateString("sv-SE", {
-        weekday: "long", year: "numeric", month: "long", day: "numeric",
-      });
-      const treatmentList = treatments.map((t) => t.name).join(" + ");
-      const subject = treatments.length > 1
-        ? `Bokningsbekräftelse – ${treatments.length} behandlingar`
-        : `Bokningsbekräftelse – ${treatments[0].name}`;
+      try {
+        const dateFormatted = new Date(booking_date + "T12:00:00Z").toLocaleDateString("sv-SE", {
+          weekday: "long", year: "numeric", month: "long", day: "numeric",
+        });
+        const treatmentList = treatments.map((t) => t.name).join(" + ");
+        const subject = treatments.length > 1
+          ? `Bokningsbekräftelse – ${treatments.length} behandlingar`
+          : `Bokningsbekräftelse – ${treatments[0].name}`;
 
-      await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${RESEND_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: "Hudfix <bokning@hudfix.se>",
-          to: [customer_email],
-          subject,
-          html: emailHtml({
-            name: customer_name,
-            treatment: treatmentList,
-            date: dateFormatted,
-            time: `${start_time}–${overall_end}`,
+        const resendRes = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${RESEND_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: brand.fromEmail,
+            to: [customer_email],
+            subject,
+            html: emailHtml({
+              name: customer_name,
+              treatment: treatmentList,
+              date: dateFormatted,
+              time: `${start_time}–${overall_end}`,
+            }),
           }),
-        }),
-      });
+        });
+
+        if (!resendRes.ok) {
+          const txt = await resendRes.text();
+          console.error("Resend non-OK:", resendRes.status, txt);
+        }
+      } catch (mailErr) {
+        // Logga men misslyckas inte själva bokningen pga mailfel.
+        console.error("Resend send failed:", mailErr);
+      }
     }
 
     return json({
@@ -177,10 +239,10 @@ function emailHtml({ name, treatment, date, time }: {
         <tr>
           <td style="background:#1a1614;padding:40px 48px 36px;">
             <p style="margin:0;font-family:'Georgia',serif;font-size:22px;color:#ffffff;letter-spacing:2px;line-height:1.25;">
-              Premium <span style="color:#c0606a;">Care</span> Portal
+              ${escapeHtml(brand.name)}
             </p>
             <p style="margin:8px 0 0;font-size:10px;letter-spacing:3px;color:#888;text-transform:uppercase;">
-              Medicinsk skönhetsklinik · TODO: ort
+              ${escapeHtml(brand.tagline)} · ${escapeHtml(brand.city)}
             </p>
           </td>
         </tr>
@@ -191,7 +253,7 @@ function emailHtml({ name, treatment, date, time }: {
               Bokningsbekräftelse
             </p>
             <h1 style="margin:0 0 32px;font-size:28px;font-weight:normal;color:#1a1614;line-height:1.2;">
-              Välkommen, ${name}.
+              Välkommen, ${escapeHtml(name)}.
             </h1>
             <p style="margin:0 0 32px;font-size:15px;color:#555;line-height:1.7;font-family:sans-serif;">
               Din bokning är bekräftad. Vi ser fram emot att välkomna dig.
@@ -200,19 +262,19 @@ function emailHtml({ name, treatment, date, time }: {
               <tr>
                 <td style="padding:20px 24px;border-bottom:1px solid #e8e2dd;">
                   <p style="margin:0 0 4px;font-size:9px;letter-spacing:3px;color:#999;text-transform:uppercase;font-family:sans-serif;">Behandling</p>
-                  <p style="margin:0;font-size:16px;color:#1a1614;">${treatment}</p>
+                  <p style="margin:0;font-size:16px;color:#1a1614;">${escapeHtml(treatment)}</p>
                 </td>
               </tr>
               <tr>
                 <td style="padding:20px 24px;border-bottom:1px solid #e8e2dd;">
                   <p style="margin:0 0 4px;font-size:9px;letter-spacing:3px;color:#999;text-transform:uppercase;font-family:sans-serif;">Datum</p>
-                  <p style="margin:0;font-size:16px;color:#1a1614;text-transform:capitalize;">${date}</p>
+                  <p style="margin:0;font-size:16px;color:#1a1614;text-transform:capitalize;">${escapeHtml(date)}</p>
                 </td>
               </tr>
               <tr>
                 <td style="padding:20px 24px;">
                   <p style="margin:0 0 4px;font-size:9px;letter-spacing:3px;color:#999;text-transform:uppercase;font-family:sans-serif;">Tid</p>
-                  <p style="margin:0;font-size:16px;color:#1a1614;">${time}</p>
+                  <p style="margin:0;font-size:16px;color:#1a1614;">${escapeHtml(time)}</p>
                 </td>
               </tr>
             </table>
@@ -224,7 +286,7 @@ function emailHtml({ name, treatment, date, time }: {
         <tr>
           <td style="padding:24px 48px;border-top:1px solid #e8e2dd;">
             <p style="margin:0;font-size:10px;letter-spacing:2px;color:#aaa;text-transform:uppercase;font-family:sans-serif;">
-              Novum Estetik · Legitimerade sjuksköterskor · TODO: ort
+              ${escapeHtml(brand.name)} · Legitimerade sjuksköterskor · ${escapeHtml(brand.city)}
             </p>
           </td>
         </tr>
@@ -233,6 +295,15 @@ function emailHtml({ name, treatment, date, time }: {
   </table>
 </body>
 </html>`;
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 function json(data: unknown, status = 200) {

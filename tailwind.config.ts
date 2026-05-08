@@ -11,6 +11,14 @@ export default {
       padding: "1.25rem",
       screens: { "2xl": "1280px" },
     },
+    screens: {
+      xs: "420px",
+      sm: "640px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1536px",
+    },
     extend: {
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],

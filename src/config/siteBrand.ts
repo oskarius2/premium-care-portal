@@ -3,16 +3,16 @@
  */
 export const siteBrand = {
   /** Officiellt namn (rubriker, logotyp-text, copyright) */
-  name: "Novum Estetik",
+  name: "Novum",
 
   /** Kort beskrivande rad under namnet */
   tagline: "Medicinsk skönhetsklinik",
 
   /** document.title och delade meta-taggar */
-  titleDefault: "Novum Estetik — Medicinsk skönhetsklinik",
+  titleDefault: "Novum — Medicinsk skönhetsklinik",
 
   metaDescription:
-    "Novum Estetik — medicinsk skönhetsvård med legitimerade sjuksköterskor. Skinbooster och bioremodellering efter konsultation.",
+    "Novum — medicinsk skönhetsklinik med legitimerad personal. Botox med Dysport och fillers med Revolax Fine, alltid efter individuell konsultation.",
 
   /** Behålls för ev. framtida användning i andra ytor */
   logoPublicPath: null as string | null,

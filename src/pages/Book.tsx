@@ -17,10 +17,20 @@ import {
 } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import { sv } from "date-fns/locale";
+import { format as formatDate } from "date-fns";
 import "react-day-picker/dist/style.css";
 import { treatments, type Treatment } from "@/data/treatments";
 import { siteContact } from "@/config/siteContact";
 import { TelLink } from "@/components/ContactAnchors";
+
+/**
+ * Formatera ett Date-objekt som lokalt YYYY-MM-DD.
+ *
+ * Använd ALDRIG `date.toISOString().split("T")[0]` här — det konverterar
+ * först till UTC, så en svensk användare som väljer "7 maj" sent på
+ * kvällen kan få datumet "6 maj" eller "8 maj" skickat till backend.
+ */
+const toLocalDateStr = (d: Date): string => formatDate(d, "yyyy-MM-dd");
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -148,24 +158,57 @@ export default function Book() {
     next();
   };
 
-  const selectDate = async (date: Date) => {
-    setState((s) => ({ ...s, date, time: "" }));
+  /**
+   * Hämtar lediga tider för valt datum.
+   *
+   * Tar emot `treatmentId` som argument istället för att läsa från `state` —
+   * setState är async i React, så om användaren klickar ett datum direkt
+   * efter att ha valt behandling kan `state.treatmentId` fortfarande vara
+   * tom när effekten körs.
+   */
+  const loadSlotsFor = async (date: Date, treatmentId: string) => {
     setSlots([]);
     setLoadingSlots(true);
     try {
-      const dateStr = date.toISOString().split("T")[0];
+      const dateStr = toLocalDateStr(date);
       const res = await fetch(
-        fn(`get-available-slots?date=${dateStr}&treatment_id=${state.treatmentId}`),
+        fn(`get-available-slots?date=${dateStr}&treatment_id=${treatmentId}`),
         { headers }
       );
+      if (!res.ok) {
+        throw new Error(`Kunde inte h\u00e4mta lediga tider (${res.status})`);
+      }
       const data = await res.json();
       setSlots(Array.isArray(data?.slots) ? data.slots : []);
-    } catch {
+      return true;
+    } catch (err) {
       setSlots([]);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Kunde inte h\u00e4mta lediga tider — f\u00f6rs\u00f6k igen."
+      );
+      return false;
     } finally {
       setLoadingSlots(false);
-      next();
     }
+  };
+
+  const selectDate = async (date: Date) => {
+    setState((s) => ({ ...s, date, time: "" }));
+    // Tar `treatmentId` från senaste state via uppdatering nedan om det saknas.
+    let treatmentId = state.treatmentId;
+    if (!treatmentId && state.treatmentSlug) {
+      treatmentId = await fetchTreatmentId(state.treatmentSlug);
+      setState((s) => ({ ...s, treatmentId }));
+    }
+    if (!treatmentId) {
+      setError("V\u00e4lj behandling f\u00f6rst.");
+      return;
+    }
+    const ok = await loadSlotsFor(date, treatmentId);
+    // G\u00e5 bara vidare till tids-steget om hämtningen lyckades.
+    if (ok) next();
   };
 
   const submit = async () => {
@@ -178,7 +221,7 @@ export default function Book() {
         headers,
         body: JSON.stringify({
           treatment_id: state.treatmentId,
-          booking_date: state.date.toISOString().split("T")[0],
+          booking_date: toLocalDateStr(state.date),
           start_time: state.time,
           customer_name: state.name,
           customer_email: state.email,
@@ -660,9 +703,15 @@ function BookingSummary({
 
       <div className="hidden lg:block mt-5 px-1">
         <p className="text-xs text-muted-foreground mb-2">Behöver du hjälp?</p>
-        <TelLink className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-accent-deep transition-colors">
-          <Phone size={14} /> {siteContact.phoneDisplay}
-        </TelLink>
+        {siteContact.phoneDisplay.trim() && siteContact.phoneTel ? (
+          <TelLink className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-accent-deep transition-colors">
+            <Phone size={14} /> {siteContact.phoneDisplay}
+          </TelLink>
+        ) : (
+          <Link to="/kontakt" className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-accent-deep transition-colors">
+            <ArrowRight size={14} /> Se adress & kontakt
+          </Link>
+        )}
       </div>
     </aside>
   );
@@ -774,13 +823,19 @@ function Confirmation({
           <Link to="/" className="btn-secondary">
             Tillbaka till start
           </Link>
-          <TelLink className="btn-primary">
-            <Phone size={18} /> {siteContact.phoneDisplay}
-          </TelLink>
+          {siteContact.phoneDisplay.trim() && siteContact.phoneTel ? (
+            <TelLink className="btn-primary">
+              <Phone size={18} /> {siteContact.phoneDisplay}
+            </TelLink>
+          ) : (
+            <Link to="/kontakt" className="btn-primary">
+              <ArrowRight size={18} /> Kontakt & adress
+            </Link>
+          )}
         </div>
 
         <p className="text-xs text-muted-foreground text-center mt-8 leading-relaxed max-w-md mx-auto">
-          Behöver du ändra eller avboka? Ring oss senast 24 timmar innan så hjälper vi dig direkt.
+          Behöver du ändra eller avboka? Hör av dig i god tid före ditt besök så hjälper vi dig vidare.
         </p>
       </div>
     </section>
