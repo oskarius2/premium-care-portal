@@ -1,0 +1,1171 @@
+diff --git a/src/pages/Admin.tsx b/src/pages/Admin.tsx
+index 54be264..58faf08 100644
+--- a/src/pages/Admin.tsx
++++ b/src/pages/Admin.tsx
+@@ -1,6 +1,6 @@
+ import { useEffect, useState, useCallback, useRef, useMemo } from "react";
+ import { useNavigate } from "react-router-dom";
+-import { Check, X, Trash2, Plus, Calendar, Clock, Bell, LogOut, LayoutDashboard, CalendarDays, Ban, Mail, Phone, MessageSquare, TrendingUp, Search } from "lucide-react";
++import { Check, X, Trash2, Plus, Calendar, Clock, Bell, LogOut, LayoutDashboard, CalendarDays, Ban, Mail, Phone, MessageSquare, TrendingUp, Search, Link2, Copy } from "lucide-react";
+ import { supabase } from "@/integrations/supabase/client";
+ import { toast } from "sonner";
+ 
+@@ -22,6 +22,7 @@ type Booking = {
+ type Treatment = { id: string; name: string; category: string; duration_minutes: number };
+ type Rule = { id: string; day_of_week: number; start_time: string; end_time: string };
+ type Blocked = { id: string; blocked_date: string; all_day: boolean; start_time: string | null; end_time: string | null; reason: string | null };
++type IcalToken = { id: string; label: string; created_at: string; last_used_at: string | null; revoked_at: string | null };
+ 
+ const DAYS = ["", "Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lördag", "Söndag"];
+ 
+@@ -74,7 +75,7 @@ export default function Admin() {
+   const [isAdmin, setIsAdmin] = useState(false);
+   const [userEmail, setUserEmail] = useState<string>("");
+ 
+-  const [tab, setTab] = useState<"dashboard" | "bookings" | "availability" | "blocked">("dashboard");
++  const [tab, setTab] = useState<"dashboard" | "bookings" | "availability" | "blocked" | "calendar">("dashboard");
+   const [bookings, setBookings] = useState<Booking[]>([]);
+   const [treatments, setTreatments] = useState<Record<string, Treatment>>({});
+   const [rules, setRules] = useState<Rule[]>([]);
+@@ -84,6 +85,12 @@ export default function Admin() {
+   const [newRule, setNewRule] = useState({ day_of_week: 1, start_time: "09:00", end_time: "17:00" });
+   const [newBlocked, setNewBlocked] = useState({ blocked_date: "", all_day: true, start_time: "09:00", end_time: "17:00", reason: "" });
+ 
++  // iCal-tokens (visas bara i "calendar"-fliken)
++  const [icalTokens, setIcalTokens] = useState<IcalToken[]>([]);
++  const [newTokenLabel, setNewTokenLabel] = useState("");
++  const [justCreatedToken, setJustCreatedToken] = useState<{ id: string; label: string; token: string } | null>(null);
++  const [tokensLoading, setTokensLoading] = useState(false);
++
+   // Bokningar — sök/filter
+   const [search, setSearch] = useState("");
+   const [statusFilter, setStatusFilter] = useState<"all" | "confirmed" | "completed" | "cancelled" | "no_show">("all");
+@@ -245,6 +252,83 @@ export default function Admin() {
+     navigate("/admin/auth", { replace: true });
+   };
+ 
++  // ── ICAL TOKENS ────────────────────────────────────────
++  // Hämtas via edge function `ical-tokens` (inte direkt mot tabellen),
++  // dels för att klartext-tokenen bara genereras serverside, dels för
++  // att vi vill ha CORS-allowlistade endpoints i alla skrivningar.
++  const callIcalApi = useCallback(async (init: RequestInit & { qs?: string } = {}) => {
++    const { data: { session } } = await supabase.auth.getSession();
++    if (!session) throw new Error("Inte inloggad");
++    const base = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ical-tokens`;
++    const res = await fetch(base + (init.qs ?? ""), {
++      ...init,
++      headers: {
++        ...(init.headers ?? {}),
++        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
++        Authorization: `Bearer ${session.access_token}`,
++        "Content-Type": "application/json",
++      },
++    });
++    const data = await res.json().catch(() => ({}));
++    if (!res.ok) throw new Error(data?.error ?? `HTTP ${res.status}`);
++    return data;
++  }, []);
++
++  const loadIcalTokens = useCallback(async () => {
++    setTokensLoading(true);
++    try {
++      const data = await callIcalApi({ method: "GET" });
++      setIcalTokens((data.tokens ?? []) as IcalToken[]);
++    } catch (e) {
++      toast.error(e instanceof Error ? e.message : "Kunde inte hämta tokens");
++    } finally {
++      setTokensLoading(false);
++    }
++  }, [callIcalApi]);
++
++  useEffect(() => {
++    if (isAdmin && tab === "calendar") loadIcalTokens();
++  }, [isAdmin, tab, loadIcalTokens]);
++
++  const createIcalToken = async () => {
++    const label = newTokenLabel.trim();
++    if (!label) return toast.error("Ange en etikett");
++    try {
++      const data = await callIcalApi({
++        method: "POST",
++        body: JSON.stringify({ label }),
++      });
++      setJustCreatedToken({ id: data.id, label: data.label, token: data.token });
++      setNewTokenLabel("");
++      await loadIcalTokens();
++    } catch (e) {
++      toast.error(e instanceof Error ? e.message : "Kunde inte skapa token");
++    }
++  };
++
++  const revokeIcalToken = async (id: string) => {
++    if (!confirm("Återkalla denna token? Befintliga kalender-prenumerationer slutar fungera direkt.")) return;
++    try {
++      await callIcalApi({ method: "DELETE", qs: `?id=${encodeURIComponent(id)}` });
++      toast.success("Token återkallad");
++      await loadIcalTokens();
++    } catch (e) {
++      toast.error(e instanceof Error ? e.message : "Kunde inte återkalla");
++    }
++  };
++
++  const buildFeedUrl = (token: string) =>
++    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ical-feed?token=${encodeURIComponent(token)}`;
++
++  const copyToClipboard = async (text: string) => {
++    try {
++      await navigator.clipboard.writeText(text);
++      toast.success("Kopierat");
++    } catch {
++      toast.error("Kunde inte kopiera");
++    }
++  };
++
+   // ── RENDER GUARDS ──────────────────────────────────────
+   if (authChecking) {
+     return (
+@@ -310,6 +394,7 @@ export default function Admin() {
+             ["bookings", "Bokningar", CalendarDays],
+             ["availability", "Tillgänglighet", Calendar],
+             ["blocked", "Spärrade tider", Ban],
++            ["calendar", "Kalender-feed", Link2],
+           ] as const).map(([id, label, Icon]) => (
+             <button
+               key={id}
+@@ -620,6 +705,111 @@ export default function Admin() {
+           </div>
+         )}
+ 
++        {/* ── CALENDAR FEED TOKENS ──────────── */}
++        {tab === "calendar" && !loading && (
++          <div className="max-w-2xl">
++            <p className="text-sm text-muted-foreground font-light mb-8 leading-relaxed">
++              Skapa en personlig prenumerations-länk för att se bokningarna i din
++              egen kalender (Google Calendar, Apple Kalender, Outlook). Återkalla
++              en token om en enhet tappas bort eller en medarbetare slutar — det
++              påverkar inte andra prenumerationer.
++            </p>
++
++            {/* Engångsvisning av nyligen skapad token */}
++            {justCreatedToken && (
++              <div className="border border-primary/40 bg-accent-soft/50 p-5 mb-8 space-y-3">
++                <div className="flex items-baseline justify-between gap-4">
++                  <p className="eyebrow text-accent-deep">Ny token skapad — kopiera nu</p>
++                  <button
++                    onClick={() => setJustCreatedToken(null)
++                    }
++                    className="text-xs uppercase tracking-[0.22em] text-muted-foreground hover:text-foreground"
++                  >
++                    Stäng
++                  </button>
++                </div>
++                <p className="text-xs text-muted-foreground font-light">
++                  Tokenen visas <strong className="text-foreground">endast en gång</strong>.
++                  Klistra in URL:en nedan i din kalender-app som en
++                  prenumeration / "Subscribe to calendar".
++                </p>
++                <div className="font-mono text-xs bg-card border border-border p-3 break-all">
++                  {buildFeedUrl(justCreatedToken.token)}
++                </div>
++                <button
++                  onClick={() => copyToClipboard(buildFeedUrl(justCreatedToken.token))}
++                  className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 text-xs uppercase tracking-[0.24em] hover:bg-accent-deep transition-colors"
++                >
++                  <Copy size={12} /> Kopiera URL
++                </button>
++              </div>
++            )}
++
++            {/* Existerande tokens */}
++            <div className="border border-border divide-y divide-border mb-6 bg-card">
++              {tokensLoading && <p className="p-5 text-sm text-muted-foreground">Laddar…</p>}
++              {!tokensLoading && icalTokens.length === 0 && (
++                <p className="p-5 text-sm text-muted-foreground">Inga tokens skapade ännu.</p>
++              )}
++              {icalTokens.map((t) => (
++                <div key={t.id} className="p-4 flex items-center justify-between gap-4">
++                  <div className="min-w-0">
++                    <div className="flex items-center gap-2 flex-wrap">
++                      <Link2 size={13} className={t.revoked_at ? "text-muted-foreground" : "text-primary"} />
++                      <span className={`text-sm font-light ${t.revoked_at ? "line-through text-muted-foreground" : ""}`}>
++                        {t.label}
++                      </span>
++                      {t.revoked_at && (
++                        <span className="text-[9px] uppercase tracking-[0.22em] text-destructive bg-destructive/10 px-1.5 py-0.5 border border-destructive/30">
++                          Återkallad
++                        </span>
++                      )}
++                    </div>
++                    <p className="text-[11px] text-muted-foreground font-light mt-1">
++                      Skapad {new Date(t.created_at).toLocaleDateString("sv-SE")}
++                      {t.last_used_at && ` · Senast använd ${new Date(t.last_used_at).toLocaleDateString("sv-SE")}`}
++                      {!t.last_used_at && !t.revoked_at && " · Aldrig använd"}
++                    </p>
++                  </div>
++                  {!t.revoked_at && (
++                    <button
++                      onClick={() => revokeIcalToken(t.id)}
++                      className="p-1.5 text-muted-foreground hover:text-destructive transition-colors flex-shrink-0"
++                      title="Återkalla"
++                    >
++                      <Trash2 size={13} />
++                    </button>
++                  )}
++                </div>
++              ))}
++            </div>
++
++            {/* Skapa ny */}
++            <div className="border border-border p-5 space-y-4 bg-card">
++              <p className="eyebrow">Ny token</p>
++              <div>
++                <label className="block text-[9px] uppercase tracking-[0.24em] text-muted-foreground mb-1">
++                  Etikett (vad är det här för enhet?)
++                </label>
++                <input
++                  type="text"
++                  value={newTokenLabel}
++                  onChange={(e) => setNewTokenLabel(e.target.value)}
++                  placeholder="t.ex. Min iPhone-kalender"
++                  maxLength={80}
++                  className="w-full border border-border bg-surface px-3 py-2 text-sm focus:outline-none focus:border-primary"
++                />
++              </div>
++              <button
++                onClick={createIcalToken}
++                className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 text-xs uppercase tracking-[0.24em] hover:bg-accent-deep transition-colors"
++              >
++                <Plus size={13} /> Skapa token
++              </button>
++            </div>
++          </div>
++        )}
++
+         {/* ── BLOCKED ───────────────────────── */}
+         {tab === "blocked" && !loading && (
+           <div className="max-w-lg">
+diff --git a/src/pages/AdminAuth.tsx b/src/pages/AdminAuth.tsx
+index 64a3ac9..0a463b1 100644
+--- a/src/pages/AdminAuth.tsx
++++ b/src/pages/AdminAuth.tsx
+@@ -4,6 +4,17 @@ import { supabase } from "@/integrations/supabase/client";
+ import { z } from "zod";
+ import { toast } from "sonner";
+ 
++/**
++ * Inloggning för admin.
++ *
++ * OBS — Sprint 1.4: Self-service-signup är borttagen. Nya admin-konton
++ * skapas via Supabase Dashboard ("Invite user") eller, längre fram, via
++ * en "Bjud in admin"-knapp i admin-panelen som anropar en serverside-
++ * funktion. Skälet är att en öppen `signUp` skapar:
++ *   * obegränsat med skräpkonton i `auth.users` (utrymme + brute-force-yta)
++ *   * förvirrande UX där en användare kan registrera sig men inte komma in
++ */
++
+ const credSchema = z.object({
+   email: z.string().trim().email("Ogiltig e-postadress").max(255),
+   password: z.string().min(8, "Minst 8 tecken").max(128),
+@@ -11,7 +22,6 @@ const credSchema = z.object({
+ 
+ export default function AdminAuth() {
+   const navigate = useNavigate();
+-  const [mode, setMode] = useState<"login" | "signup">("login");
+   const [email, setEmail] = useState("");
+   const [password, setPassword] = useState("");
+   const [loading, setLoading] = useState(false);
+@@ -33,22 +43,19 @@ export default function AdminAuth() {
+     }
+     setLoading(true);
+     try {
+-      if (mode === "login") {
+-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+-        if (error) throw error;
+-        navigate("/admin", { replace: true });
+-      } else {
+-        const { error } = await supabase.auth.signUp({
+-          email,
+-          password,
+-          options: { emailRedirectTo: `${window.location.origin}/admin` },
+-        });
+-        if (error) throw error;
+-        toast.success("Konto skapat. Be en befintlig admin tilldela behörighet.");
+-        setMode("login");
+-      }
++      const { error } = await supabase.auth.signInWithPassword({ email, password });
++      if (error) throw error;
++      navigate("/admin", { replace: true });
+     } catch (err: unknown) {
+-      const message = err instanceof Error ? err.message : "Något gick fel";
++      // Generiskt felmeddelande för att inte avslöja om kontot finns eller inte.
++      const knownMessages = new Set([
++        "Invalid login credentials",
++        "Email not confirmed",
++      ]);
++      const raw = err instanceof Error ? err.message : "";
++      const message = knownMessages.has(raw)
++        ? "Felaktiga inloggningsuppgifter"
++        : "Något gick fel — försök igen";
+       toast.error(message);
+     } finally {
+       setLoading(false);
+@@ -61,28 +68,32 @@ export default function AdminAuth() {
+     <section className="pt-28 md:pt-40 pb-32 container-narrow max-w-sm">
+       <p className="eyebrow mb-5">Admin</p>
+       <h1 className="heading-section heading-h2 mb-10">
+-        {mode === "login" ? <>Logga <span className="italic text-primary">in.</span></> : <>Nytt <span className="italic text-primary">konto.</span></>}
++        Logga <span className="italic text-primary">in.</span>
+       </h1>
+       <form onSubmit={handleSubmit} className="space-y-4">
+         <div>
+-          <label className="block eyebrow mb-2">E-post</label>
++          <label className="block eyebrow mb-2" htmlFor="admin-email">E-post</label>
+           <input
++            id="admin-email"
+             type="email"
+             value={email}
+             onChange={(e) => setEmail(e.target.value)}
+             required
++            autoComplete="email"
+             className="w-full border border-border bg-surface px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
+             placeholder="du@klinik.se"
+           />
+         </div>
+         <div>
+-          <label className="block eyebrow mb-2">Lösenord</label>
++          <label className="block eyebrow mb-2" htmlFor="admin-password">Lösenord</label>
+           <input
++            id="admin-password"
+             type="password"
+             value={password}
+             onChange={(e) => setPassword(e.target.value)}
+             required
+             minLength={8}
++            autoComplete="current-password"
+             className="w-full border border-border bg-surface px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
+             placeholder="••••••••"
+           />
+@@ -92,15 +103,11 @@ export default function AdminAuth() {
+           disabled={loading}
+           className="w-full bg-primary text-primary-foreground py-3 text-xs uppercase tracking-[0.24em] hover:bg-accent-deep transition-colors disabled:opacity-50"
+         >
+-          {loading ? "..." : mode === "login" ? "Logga in" : "Skapa konto"}
+-        </button>
+-        <button
+-          type="button"
+-          onClick={() => setMode(mode === "login" ? "signup" : "login")}
+-          className="w-full text-xs uppercase tracking-[0.22em] text-muted-foreground hover:text-foreground transition-colors pt-2"
+-        >
+-          {mode === "login" ? "Skapa nytt konto" : "Tillbaka till inloggning"}
++          {loading ? "..." : "Logga in"}
+         </button>
++        <p className="pt-4 text-[10px] uppercase tracking-[0.22em] text-muted-foreground text-center leading-relaxed">
++          Saknar du konto? Kontakta en befintlig administratör.
++        </p>
+       </form>
+     </section>
+   );
+diff --git a/supabase/functions/_shared/cors.ts b/supabase/functions/_shared/cors.ts
+new file mode 100644
+index 0000000..35d751d
+--- /dev/null
++++ b/supabase/functions/_shared/cors.ts
+@@ -0,0 +1,58 @@
++/**
++ * Centraliserad CORS-hantering för edge functions.
++ *
++ * Skälet till en allowlist istället för "*":
++ *   Edge functionen `create-booking` är ett offentligt skrivande API
++ *   (anon key räcker). Med "*" kan vilken sida som helst anropa det
++ *   och fylla kalendern med skräp eller belasta Resend-kvoten.
++ *
++ *   Vi behåller ändå "Access-Control-Allow-Origin" för förhandsbegärda
++ *   CORS-anrop från godkända origins och returnerar "null" annars så
++ *   browsern blockerar svaret.
++ *
++ * Lägg till nya domäner via secret BRAND_ALLOWED_ORIGINS (kommaseparerad).
++ * Saknas den används default-listan nedan.
++ */
++
++const DEFAULT_ALLOWED = [
++  "https://novumestetik.se",
++  "https://www.novumestetik.se",
++  "http://localhost:8080",
++  "http://localhost:5173",
++];
++
++const extra = (Deno.env.get("BRAND_ALLOWED_ORIGINS") ?? "")
++  .split(",")
++  .map((s) => s.trim())
++  .filter(Boolean);
++
++const ALLOWED = new Set<string>([...DEFAULT_ALLOWED, ...extra]);
++
++export function corsHeaders(req: Request): HeadersInit {
++  const origin = req.headers.get("Origin") ?? "";
++  const allow = ALLOWED.has(origin) ? origin : "null";
++  return {
++    "Access-Control-Allow-Origin": allow,
++    "Vary": "Origin",
++    "Access-Control-Allow-Headers":
++      "authorization, x-client-info, apikey, content-type",
++    "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
++    "Access-Control-Max-Age": "86400",
++  };
++}
++
++/** Hjälpare för att svara på OPTIONS-preflight. */
++export function handleOptions(req: Request): Response {
++  return new Response("ok", { headers: corsHeaders(req) });
++}
++
++/** Standardiserad JSON-responshjälpare med CORS. */
++export function jsonResponse(req: Request, data: unknown, status = 200): Response {
++  return new Response(JSON.stringify(data), {
++    status,
++    headers: {
++      ...corsHeaders(req),
++      "Content-Type": "application/json",
++    },
++  });
++}
+diff --git a/supabase/functions/admin-bookings/index.ts b/supabase/functions/admin-bookings/index.ts
+index ff91bd9..5e2c113 100644
+--- a/supabase/functions/admin-bookings/index.ts
++++ b/supabase/functions/admin-bookings/index.ts
+@@ -1,18 +1,14 @@
+ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+-
+-const cors = {
+-  "Access-Control-Allow-Origin": "*",
+-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+-};
++import { handleOptions, jsonResponse } from "../_shared/cors.ts";
+ 
+ Deno.serve(async (req) => {
+-  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
++  if (req.method === "OPTIONS") return handleOptions(req);
+ 
+   // Auth check
+   const auth = req.headers.get("Authorization") ?? "";
+   const token = auth.replace("Bearer ", "");
+   if (token !== Deno.env.get("ADMIN_SECRET")) {
+-    return json({ error: "Unauthorized" }, 401);
++    return jsonResponse(req, { error: "Unauthorized" }, 401);
+   }
+ 
+   const supabase = createClient(
+@@ -31,16 +27,16 @@ Deno.serve(async (req) => {
+         .select("*, booking_treatments(name, duration_minutes, category)")
+         .order("booking_date", { ascending: true })
+         .order("start_time", { ascending: true });
+-      if (error) return json({ error: error.message }, 500);
+-      return json({ bookings: data });
++      if (error) return jsonResponse(req, { error: "Databasfel" }, 500);
++      return jsonResponse(req, { bookings: data });
+     }
+ 
+     if (req.method === "PATCH") {
+       const { id, status } = await req.json();
+-      if (!id || !status) return json({ error: "id and status required" }, 400);
++      if (!id || !status) return jsonResponse(req, { error: "id and status required" }, 400);
+       const { error } = await supabase.from("bookings").update({ status }).eq("id", id);
+-      if (error) return json({ error: error.message }, 500);
+-      return json({ ok: true });
++      if (error) return jsonResponse(req, { error: "Databasfel" }, 500);
++      return jsonResponse(req, { ok: true });
+     }
+   }
+ 
+@@ -52,8 +48,8 @@ Deno.serve(async (req) => {
+         .select("*")
+         .order("day_of_week")
+         .order("start_time");
+-      if (error) return json({ error: error.message }, 500);
+-      return json({ rules: data });
++      if (error) return jsonResponse(req, { error: "Databasfel" }, 500);
++      return jsonResponse(req, { rules: data });
+     }
+ 
+     if (req.method === "POST") {
+@@ -61,16 +57,16 @@ Deno.serve(async (req) => {
+       const { error } = await supabase
+         .from("availability_rules")
+         .insert({ day_of_week, start_time, end_time });
+-      if (error) return json({ error: error.message }, 500);
+-      return json({ ok: true });
++      if (error) return jsonResponse(req, { error: "Databasfel" }, 500);
++      return jsonResponse(req, { ok: true });
+     }
+ 
+     if (req.method === "DELETE") {
+       const id = url.searchParams.get("id");
+-      if (!id) return json({ error: "id required" }, 400);
++      if (!id) return jsonResponse(req, { error: "id required" }, 400);
+       const { error } = await supabase.from("availability_rules").delete().eq("id", id);
+-      if (error) return json({ error: error.message }, 500);
+-      return json({ ok: true });
++      if (error) return jsonResponse(req, { error: "Databasfel" }, 500);
++      return jsonResponse(req, { ok: true });
+     }
+   }
+ 
+@@ -81,8 +77,8 @@ Deno.serve(async (req) => {
+         .from("blocked_times")
+         .select("*")
+         .order("blocked_date");
+-      if (error) return json({ error: error.message }, 500);
+-      return json({ blocked: data });
++      if (error) return jsonResponse(req, { error: "Databasfel" }, 500);
++      return jsonResponse(req, { blocked: data });
+     }
+ 
+     if (req.method === "POST") {
+@@ -90,25 +86,20 @@ Deno.serve(async (req) => {
+       const { error } = await supabase
+         .from("blocked_times")
+         .insert({ blocked_date, start_time: all_day ? null : start_time, end_time: all_day ? null : end_time, all_day: all_day ?? false, reason });
+-      if (error) return json({ error: error.message }, 500);
+-      return json({ ok: true });
++      if (error) return jsonResponse(req, { error: "Databasfel" }, 500);
++      return jsonResponse(req, { ok: true });
+     }
+ 
+     if (req.method === "DELETE") {
+       const id = url.searchParams.get("id");
+-      if (!id) return json({ error: "id required" }, 400);
++      if (!id) return jsonResponse(req, { error: "id required" }, 400);
+       const { error } = await supabase.from("blocked_times").delete().eq("id", id);
+-      if (error) return json({ error: error.message }, 500);
+-      return json({ ok: true });
++      if (error) return jsonResponse(req, { error: "Databasfel" }, 500);
++      return jsonResponse(req, { ok: true });
+     }
+   }
+ 
+-  return json({ error: "Unknown resource" }, 404);
++  return jsonResponse(req, { error: "Unknown resource" }, 404);
+ });
+ 
+-function json(data: unknown, status = 200) {
+-  return new Response(JSON.stringify(data), {
+-    status,
+-    headers: { ...cors, "Content-Type": "application/json" },
+-  });
+-}
++
+diff --git a/supabase/functions/create-booking/index.ts b/supabase/functions/create-booking/index.ts
+index 09dc5ae..8a329a1 100644
+--- a/supabase/functions/create-booking/index.ts
++++ b/supabase/functions/create-booking/index.ts
+@@ -1,10 +1,6 @@
+ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+ import { brand } from "../_shared/brand.ts";
+-
+-const cors = {
+-  "Access-Control-Allow-Origin": "*",
+-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+-};
++import { corsHeaders, handleOptions, jsonResponse } from "../_shared/cors.ts";
+ 
+ type InsertBookingRow = {
+   treatment_id: string;
+@@ -35,7 +31,7 @@ const toTime = (mm: number) => `${pad(Math.floor(mm / 60))}:${pad(mm % 60)}`;
+    Klienten anropar create-booking en gång per "besök" så flera separata
+    besök blir flera anrop – inte detta endpoints ansvar att kedja samman dem. */
+ Deno.serve(async (req) => {
+-  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
++  if (req.method === "OPTIONS") return handleOptions(req);
+ 
+   try {
+     const body = await req.json();
+@@ -55,15 +51,15 @@ Deno.serve(async (req) => {
+       : (treatment_id ? [treatment_id] : []);
+ 
+     if (ids.length === 0 || ids.length > 3 || !booking_date || !start_time || !customer_name || !customer_email) {
+-      return json({ error: "Missing required fields" }, 400);
++      return jsonResponse(req, { error: "Missing required fields" }, 400);
+     }
+ 
+     // Grundvalidering av format så vi inte gör onödig DB-trafik
+     if (!/^\d{4}-\d{2}-\d{2}$/.test(booking_date)) {
+-      return json({ error: "Ogiltigt datumformat" }, 400);
++      return jsonResponse(req, { error: "Ogiltigt datumformat" }, 400);
+     }
+     if (!/^\d{2}:\d{2}(:\d{2})?$/.test(start_time)) {
+-      return json({ error: "Ogiltigt tidsformat" }, 400);
++      return jsonResponse(req, { error: "Ogiltigt tidsformat" }, 400);
+     }
+ 
+     const supabase = createClient(
+@@ -79,7 +75,7 @@ Deno.serve(async (req) => {
+       .eq("active", true);
+ 
+     if (tErr || !treatmentRows || treatmentRows.length !== ids.length) {
+-      return json({ error: "Treatment not found" }, 404);
++      return jsonResponse(req, { error: "Treatment not found" }, 404);
+     }
+ 
+     // Bevara klientens ordning
+@@ -109,7 +105,7 @@ Deno.serve(async (req) => {
+     });
+ 
+     if (!fitsInARule) {
+-      return json({ error: "Tiden ligger utanför öppettiderna" }, 409);
++      return jsonResponse(req, { error: "Tiden ligger utanför öppettiderna" }, 409);
+     }
+ 
+     const { data: blocked } = await supabase
+@@ -126,10 +122,13 @@ Deno.serve(async (req) => {
+     });
+ 
+     if (overlapsBlocked) {
+-      return json({ error: "Tiden är spärrad" }, 409);
++      return jsonResponse(req, { error: "Tiden är spärrad" }, 409);
+     }
+ 
+-    // Konfliktkontroll mot hela blocket
++    // Belt-and-braces: gör en optimistisk konfliktkontroll först. Den
++    // verkliga garantin sker via EXCLUDE-constraint `bookings_no_overlap`
++    // i DB:n — men en explicit check ger snyggare felmeddelande i 99 %
++    // av fallen och sparar en onödig INSERT-rundtur.
+     const { data: conflicts } = await supabase
+       .from("bookings")
+       .select("id")
+@@ -139,7 +138,7 @@ Deno.serve(async (req) => {
+       .gt("end_time", start_time);
+ 
+     if (conflicts && conflicts.length > 0) {
+-      return json({ error: "Tiden är inte längre tillgänglig" }, 409);
++      return jsonResponse(req, { error: "Tiden är inte längre tillgänglig" }, 409);
+     }
+ 
+     // Bygg en bokningsrad per behandling, på varandra följande
+@@ -169,8 +168,23 @@ Deno.serve(async (req) => {
+       .select("id");
+ 
+     if (bErr || !inserted || inserted.length === 0) {
+-      console.error("Booking insert error:", bErr);
+-      return json({ error: "Kunde inte skapa bokning" }, 500);
++      // 23P01 = exclusion_violation från `bookings_no_overlap`-constraint:
++      // någon hann boka samma slot mellan vår SELECT-check och INSERT.
++      // Mappa till samma 409 som den optimistiska kontrollen ovan.
++      if (bErr?.code === "23P01") {
++        return jsonResponse(
++          req,
++          { error: "Tiden hann bokas av någon annan — välj en annan tid." },
++          409,
++        );
++      }
++      // Logga endast metadata — aldrig PII (kundnamn/e-post/meddelande).
++      console.error("booking_insert_failed", {
++        code: bErr?.code,
++        hint: bErr?.hint,
++        message: bErr?.message,
++      });
++      return jsonResponse(req, { error: "Kunde inte skapa bokning" }, 500);
+     }
+ 
+     // Bekräftelsemail – en mail per besök, lista alla behandlingar.
+@@ -206,23 +220,26 @@ Deno.serve(async (req) => {
+         });
+ 
+         if (!resendRes.ok) {
+-          const txt = await resendRes.text();
+-          console.error("Resend non-OK:", resendRes.status, txt);
++          // Logga endast statuskod — svarstexten kan innehålla mottagarens
++          // e-postadress (PII) i Resend-felmeddelanden.
++          console.error("resend_non_ok", { status: resendRes.status });
+         }
+       } catch (mailErr) {
+         // Logga men misslyckas inte själva bokningen pga mailfel.
+-        console.error("Resend send failed:", mailErr);
++        const msg = mailErr instanceof Error ? mailErr.message : "unknown";
++        console.error("resend_send_failed", { error: msg });
+       }
+     }
+ 
+-    return json({
++    return jsonResponse(req, {
+       booking_id: inserted[0].id,
+       booking_ids: inserted.map((r) => r.id),
+     });
+   } catch (err) {
+     const msg = err instanceof Error ? err.message : "Unknown error";
+-    console.error("create-booking:", msg);
+-    return json({ error: msg }, 500);
++    // Logga fel-typ men exponera inte stack/payload till klienten.
++    console.error("create_booking_unhandled", { message: msg });
++    return jsonResponse(req, { error: "Något gick fel" }, 500);
+   }
+ });
+ 
+@@ -306,9 +323,4 @@ function escapeHtml(s: string): string {
+     .replace(/'/g, "&#39;");
+ }
+ 
+-function json(data: unknown, status = 200) {
+-  return new Response(JSON.stringify(data), {
+-    status,
+-    headers: { ...cors, "Content-Type": "application/json" },
+-  });
+-}
++
+diff --git a/supabase/functions/get-available-slots/index.ts b/supabase/functions/get-available-slots/index.ts
+index 1528c4c..6e9eef9 100644
+--- a/supabase/functions/get-available-slots/index.ts
++++ b/supabase/functions/get-available-slots/index.ts
+@@ -1,16 +1,12 @@
+ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+-
+-const cors = {
+-  "Access-Control-Allow-Origin": "*",
+-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+-};
++import { handleOptions, jsonResponse } from "../_shared/cors.ts";
+ 
+ /* get-available-slots
+    Stöder både ett enskilt treatment_id (legacy) och en kommaseparerad
+    lista treatment_ids – behandlingarnas duration summeras så vi hittar
+    en sammanhängande lucka som rymmer hela besöket. */
+ Deno.serve(async (req) => {
+-  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
++  if (req.method === "OPTIONS") return handleOptions(req);
+ 
+   try {
+     const url = new URL(req.url);
+@@ -19,12 +15,12 @@ Deno.serve(async (req) => {
+       url.searchParams.get("treatment_ids") ?? url.searchParams.get("treatment_id");
+ 
+     if (!date || !treatmentIdsParam) {
+-      return json({ error: "date and treatment_ids required" }, 400);
++      return jsonResponse(req, { error: "date and treatment_ids required" }, 400);
+     }
+ 
+     const treatmentIds = treatmentIdsParam.split(",").map((s) => s.trim()).filter(Boolean);
+     if (treatmentIds.length === 0 || treatmentIds.length > 3) {
+-      return json({ error: "1–3 treatment_ids required" }, 400);
++      return jsonResponse(req, { error: "1–3 treatment_ids required" }, 400);
+     }
+ 
+     const supabase = createClient(
+@@ -40,7 +36,7 @@ Deno.serve(async (req) => {
+       .eq("active", true);
+ 
+     if (tErr || !treatments || treatments.length !== treatmentIds.length) {
+-      return json({ error: "Treatment not found" }, 404);
++      return jsonResponse(req, { error: "Treatment not found" }, 404);
+     }
+ 
+     const durationMin: number = treatments.reduce(
+@@ -55,7 +51,7 @@ Deno.serve(async (req) => {
+       .select("start_time, end_time")
+       .eq("day_of_week", dayOfWeek);
+ 
+-    if (!rules || rules.length === 0) return json({ slots: [] });
++    if (!rules || rules.length === 0) return jsonResponse(req, { slots: [] });
+ 
+     const { data: blocked } = await supabase
+       .from("blocked_times")
+@@ -105,17 +101,10 @@ Deno.serve(async (req) => {
+       }
+     }
+ 
+-    return json({ slots, total_duration_minutes: durationMin });
++    return jsonResponse(req, { slots, total_duration_minutes: durationMin });
+   } catch (err) {
+     const msg = err instanceof Error ? err.message : "Unknown error";
+-    console.error("get-available-slots:", msg);
+-    return json({ error: msg }, 500);
++    console.error("get_available_slots_error", { message: msg });
++    return jsonResponse(req, { error: "Något gick fel" }, 500);
+   }
+ });
+-
+-function json(data: unknown, status = 200) {
+-  return new Response(JSON.stringify(data), {
+-    status,
+-    headers: { ...cors, "Content-Type": "application/json" },
+-  });
+-}
+diff --git a/supabase/functions/ical-feed/index.ts b/supabase/functions/ical-feed/index.ts
+index 8eff1ec..447416e 100644
+--- a/supabase/functions/ical-feed/index.ts
++++ b/supabase/functions/ical-feed/index.ts
+@@ -1,6 +1,20 @@
+ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+ import { brand } from "../_shared/brand.ts";
+ 
++/**
++ * iCal-feed för admin-kalendrar (Google / Apple / Outlook).
++ *
++ * Auth: per-användare-tokens lagrade som SHA-256-hash i tabellen
++ *   `ical_feed_tokens`. Klartext-tokenen finns bara i kalender-klientens
++ *   prenumerations-URL och i den engångsvisning som admin-UI:t gör vid
++ *   skapande. Återkalla via UPDATE … SET revoked_at = now().
++ *
++ * Fallback: om ingen token matchar accepteras tillfälligt den gamla
++ *   ADMIN_SECRET-tokenen så att existerande integrationer inte bryts
++ *   abrupt vid utrullning. Kommentera ut blocket när alla användare
++ *   migrerat till nya tokens — *senast 14 dagar efter deploy*.
++ */
++
+ type BookingIcalRow = {
+   id: string;
+   booking_date: string;
+@@ -12,23 +26,82 @@ type BookingIcalRow = {
+   booking_treatments?: { name?: string | null } | null;
+ };
+ 
++async function sha256Hex(input: string): Promise<string> {
++  const buf = await crypto.subtle.digest(
++    "SHA-256",
++    new TextEncoder().encode(input),
++  );
++  return [...new Uint8Array(buf)]
++    .map((b) => b.toString(16).padStart(2, "0"))
++    .join("");
++}
++
+ Deno.serve(async (req) => {
+   const url = new URL(req.url);
+   const token = url.searchParams.get("token");
+ 
+-  if (token !== Deno.env.get("ADMIN_SECRET")) {
++  if (!token) {
+     return new Response("Unauthorized", { status: 401 });
+   }
+ 
+   const supabase = createClient(
+     Deno.env.get("SUPABASE_URL")!,
+-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
++    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+   );
+ 
++  // Slå upp token via SHA-256-hash. Endast aktiva (icke-återkallade) godtas.
++  const tokenHash = await sha256Hex(token);
++  const { data: tokenRow } = await supabase
++    .from("ical_feed_tokens")
++    .select("id, revoked_at")
++    .eq("token_hash", tokenHash)
++    .maybeSingle();
++
++  let authorized = false;
++
++  if (tokenRow && !tokenRow.revoked_at) {
++    authorized = true;
++    // Fire-and-forget — vi väntar inte på uppdateringen då feeden ska
++    // levereras snabbt. Felsökningsvärde är dessutom lågt.
++    supabase
++      .from("ical_feed_tokens")
++      .update({ last_used_at: new Date().toISOString() })
++      .eq("id", tokenRow.id)
++      .then(() => {});
++  } else {
++    // ── DEPRECATED FALLBACK ────────────────────────────────────────
++    // Tillåt gammal ADMIN_SECRET tills alla användare bytt token.
++    // TODO: Ta bort detta block senast 14 dagar efter deploy.
++    const legacy = Deno.env.get("ADMIN_SECRET");
++    if (legacy && token === legacy) {
++      authorized = true;
++      console.warn("ical_feed_legacy_token_used");
++    }
++    // ───────────────────────────────────────────────────────────────
++  }
++
++  if (!authorized) {
++    return new Response("Unauthorized", { status: 401 });
++  }
++
++  // Hämta endast bokningar i ett rimligt fönster — annars växer feeden
++  // obegränsat och kalender-klienter får tunga svar.
++  const today = new Date();
++  const ninetyDaysAgo = new Date(today.getTime() - 90 * 86400000)
++    .toISOString()
++    .slice(0, 10);
++  const oneYearAhead = new Date(today.getTime() + 365 * 86400000)
++    .toISOString()
++    .slice(0, 10);
++
+   const { data: bookings } = await supabase
+     .from("bookings")
+-    .select("id, booking_date, start_time, end_time, customer_name, treatment_id, created_at, booking_treatments(name)")
++    .select(
++      "id, booking_date, start_time, end_time, customer_name, treatment_id, created_at, booking_treatments(name)",
++    )
+     .neq("status", "cancelled")
++    .gte("booking_date", ninetyDaysAgo)
++    .lte("booking_date", oneYearAhead)
+     .order("booking_date", { ascending: true });
+ 
+   const now = formatIcalDate(new Date());
+@@ -70,6 +143,8 @@ Deno.serve(async (req) => {
+     headers: {
+       "Content-Type": "text/calendar; charset=utf-8",
+       "Content-Disposition": `attachment; filename="${fileSafe}-bokningar.ics"`,
++      // Cache i 5 minuter — kalender-klienter pollar typiskt var 15:e min.
++      "Cache-Control": "private, max-age=300",
+     },
+   });
+ });
+diff --git a/supabase/functions/ical-tokens/index.ts b/supabase/functions/ical-tokens/index.ts
+new file mode 100644
+index 0000000..6d20132
+--- /dev/null
++++ b/supabase/functions/ical-tokens/index.ts
+@@ -0,0 +1,144 @@
++import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
++import { handleOptions, jsonResponse } from "../_shared/cors.ts";
++
++/**
++ * ical-tokens — admin-CRUD för per-användare-tokens till iCal-feeden.
++ *
++ * Endpoints:
++ *   GET    /            → lista alla tokens (utan klartext)
++ *   POST   /            → skapa ny token { label } → returnerar { token } EN gång
++ *   DELETE /?id=<uuid>  → återkalla en token (sätter revoked_at)
++ *
++ * Auth: använder kallarens JWT (anon-key + Bearer <user-jwt>) och
++ * verifierar att personen har admin-roll via `has_role()`. RLS-policyn
++ * på `ical_feed_tokens` återskapar samma kontroll på DB-nivå som
++ * defense-in-depth.
++ */
++
++async function sha256Hex(input: string): Promise<string> {
++  const buf = await crypto.subtle.digest(
++    "SHA-256",
++    new TextEncoder().encode(input),
++  );
++  return [...new Uint8Array(buf)]
++    .map((b) => b.toString(16).padStart(2, "0"))
++    .join("");
++}
++
++/** 256 bitar entropi i base64url, utan padding. */
++function generateToken(): string {
++  const bytes = new Uint8Array(32);
++  crypto.getRandomValues(bytes);
++  return btoa(String.fromCharCode(...bytes))
++    .replace(/\+/g, "-")
++    .replace(/\//g, "_")
++    .replace(/=+$/, "");
++}
++
++Deno.serve(async (req) => {
++  if (req.method === "OPTIONS") return handleOptions(req);
++
++  // Verifiera JWT — vi använder kallarens token, inte service role,
++  // så att RLS-policyn "Admins manage ical tokens" faktiskt kontrollerar
++  // behörigheten.
++  const authHeader = req.headers.get("Authorization") ?? "";
++  if (!authHeader.startsWith("Bearer ")) {
++    return jsonResponse(req, { error: "Unauthorized" }, 401);
++  }
++
++  const supabase = createClient(
++    Deno.env.get("SUPABASE_URL")!,
++    Deno.env.get("SUPABASE_ANON_KEY")!,
++    { global: { headers: { Authorization: authHeader } } },
++  );
++
++  // getUser() validerar JWT mot Supabase Auth.
++  const { data: userData, error: userErr } = await supabase.auth.getUser();
++  if (userErr || !userData.user) {
++    return jsonResponse(req, { error: "Unauthorized" }, 401);
++  }
++
++  // Defense-in-depth: dubbelkolla rollen i applikationskoden också.
++  const { data: roleRow } = await supabase
++    .from("user_roles")
++    .select("role")
++    .eq("user_id", userData.user.id)
++    .eq("role", "admin")
++    .maybeSingle();
++  if (!roleRow) {
++    return jsonResponse(req, { error: "Forbidden" }, 403);
++  }
++
++  const url = new URL(req.url);
++
++  try {
++    if (req.method === "GET") {
++      const { data, error } = await supabase
++        .from("ical_feed_tokens")
++        .select("id, label, created_at, last_used_at, revoked_at")
++        .order("created_at", { ascending: false });
++      if (error) {
++        console.error("ical_tokens_list_error", { code: error.code });
++        return jsonResponse(req, { error: "Kunde inte hämta tokens" }, 500);
++      }
++      return jsonResponse(req, { tokens: data ?? [] });
++    }
++
++    if (req.method === "POST") {
++      const body = await req.json().catch(() => ({}));
++      const label = typeof body.label === "string" ? body.label.trim() : "";
++      if (!label || label.length > 80) {
++        return jsonResponse(req, { error: "Etikett krävs (max 80 tecken)" }, 400);
++      }
++
++      const token = generateToken();
++      const tokenHash = await sha256Hex(token);
++
++      const { data, error } = await supabase
++        .from("ical_feed_tokens")
++        .insert({
++          token_hash: tokenHash,
++          label,
++          created_by: userData.user.id,
++        })
++        .select("id, label, created_at")
++        .single();
++
++      if (error || !data) {
++        console.error("ical_tokens_insert_error", { code: error?.code });
++        return jsonResponse(req, { error: "Kunde inte skapa token" }, 500);
++      }
++
++      // Klartext-tokenen returneras EN gång — vi lagrar bara hash.
++      return jsonResponse(req, {
++        id: data.id,
++        label: data.label,
++        created_at: data.created_at,
++        token,
++      });
++    }
++
++    if (req.method === "DELETE") {
++      const id = url.searchParams.get("id");
++      if (!id) return jsonResponse(req, { error: "id krävs" }, 400);
++
++      const { error } = await supabase
++        .from("ical_feed_tokens")
++        .update({ revoked_at: new Date().toISOString() })
++        .eq("id", id)
++        .is("revoked_at", null);
++
++      if (error) {
++        console.error("ical_tokens_revoke_error", { code: error.code });
++        return jsonResponse(req, { error: "Kunde inte återkalla token" }, 500);
++      }
++      return jsonResponse(req, { ok: true });
++    }
++
++    return jsonResponse(req, { error: "Method not allowed" }, 405);
++  } catch (err) {
++    const msg = err instanceof Error ? err.message : "unknown";
++    console.error("ical_tokens_unhandled", { message: msg });
++    return jsonResponse(req, { error: "Något gick fel" }, 500);
++  }
++});
+diff --git a/supabase/migrations/20260509000000_no_overlap_constraint.sql b/supabase/migrations/20260509000000_no_overlap_constraint.sql
+new file mode 100644
+index 0000000..a39c5c0
+--- /dev/null
++++ b/supabase/migrations/20260509000000_no_overlap_constraint.sql
+@@ -0,0 +1,46 @@
++-- ============================================================
++-- Sprint 1.1 — Förhindra double-bookings på databasnivå
++-- ============================================================
++--
++-- Bakgrund:
++--   Edge functionen `create-booking` gör en SELECT-konflikt-check
++--   följt av en INSERT. Mellan dessa två steg kan en annan transaktion
++--   slinka in och boka samma slot (TOCTOU race condition).
++--
++--   Lösning: en EXCLUDE-constraint som låter Postgres atomiskt
++--   garantera att två icke-avbokade bokningar aldrig överlappar.
++--
++-- Krav:
++--   * btree_gist-tillägget för att kunna jämföra range med &&
++--   * En genererad kolumn `time_range` som beskriver bokningens
++--     tidsfönster i Europe/Stockholm
++--
++-- Förändringen är bakåtkompatibel: befintliga icke-överlappande
++-- bokningar påverkas inte. Om DB:n redan innehåller överlappande
++-- icke-avbokade bokningar måste de saneras innan migrationen körs
++-- (kör staging först!).
++-- ============================================================
++
++create extension if not exists btree_gist;
++
++-- Genererad tidsfönster-kolumn. Tolkar booking_date + start_time/end_time
++-- som lokal tid i Stockholm — vilket är exakt vad UI:t skickar in.
++alter table public.bookings
++  add column if not exists time_range tstzrange
++  generated always as (
++    tstzrange(
++      ((booking_date::text || ' ' || start_time::text)::timestamp at time zone 'Europe/Stockholm'),
++      ((booking_date::text || ' ' || end_time::text)::timestamp   at time zone 'Europe/Stockholm'),
++      '[)'
++    )
++  ) stored;
++
++-- Två icke-avbokade bokningar får aldrig överlappa varandra.
++-- Avbokade bokningar ignoreras helt så att en frigjord tid kan bokas igen.
++alter table public.bookings
++  add constraint bookings_no_overlap
++  exclude using gist (time_range with &&)
++  where (status <> 'cancelled');
++
++comment on constraint bookings_no_overlap on public.bookings is
++  'Förhindrar att två icke-avbokade bokningar överlappar. Vid krock returnerar Postgres SQLSTATE 23P01 (exclusion_violation) — fångas av create-booking och mappas till HTTP 409.';
+diff --git a/supabase/migrations/20260509000100_ical_feed_tokens.sql b/supabase/migrations/20260509000100_ical_feed_tokens.sql
+new file mode 100644
+index 0000000..3e07360
+--- /dev/null
++++ b/supabase/migrations/20260509000100_ical_feed_tokens.sql
+@@ -0,0 +1,53 @@
++-- ============================================================
++-- Sprint 1.2 — Per-användare iCal-feed-tokens
++-- ============================================================
++--
++-- Bakgrund:
++--   Edge functionen `ical-feed` autentiserade tidigare med en delad
++--   ADMIN_SECRET som klistras in i kalender-klienten som query-param.
++--   Det betyder att tokenen lagras i:
++--     * URL-historik
++--     * HTTP-loggar / referer-headers
++--     * Mellanliggande proxies
++--
++--   En läcka ger evig läsåtkomst till all PII (kundnamn + behandling
++--   + tider) och kan bara stoppas genom att rotera ADMIN_SECRET —
++--   vilket också bryter `admin-bookings`-funktionen.
++--
++-- Lösning:
++--   En tabell med per-användare-tokens där endast SHA-256-hashen
++--   lagras. Nya tokens kan skapas och återkallas individuellt utan
++--   att påverka andra integrationer.
++-- ============================================================
++
++create table public.ical_feed_tokens (
++  id uuid primary key default gen_random_uuid(),
++  -- SHA-256 av tokenen i hex (64 tecken). Klartexten visas EN gång
++  -- för användaren i admin-UI och lagras aldrig i DB:n.
++  token_hash text not null unique,
++  -- Användarvänlig etikett, t.ex. "Min iPhone-kalender" eller "Reception".
++  label text not null,
++  created_by uuid references auth.users(id) on delete set null,
++  created_at timestamptz not null default now(),
++  last_used_at timestamptz,
++  revoked_at timestamptz,
++  constraint ical_feed_tokens_label_not_blank check (length(trim(label)) > 0)
++);
++
++create index idx_ical_tokens_active
++  on public.ical_feed_tokens (token_hash)
++  where revoked_at is null;
++
++alter table public.ical_feed_tokens enable row level security;
++
++-- Endast administratörer ser och hanterar tokens. Andra autentiserade
++-- användare (t.ex. framtida "user"-rollen) får ingenting.
++create policy "Admins manage ical tokens"
++  on public.ical_feed_tokens
++  for all
++  to authenticated
++  using (public.has_role(auth.uid(), 'admin'))
++  with check (public.has_role(auth.uid(), 'admin'));
++
++comment on table public.ical_feed_tokens is
++  'Per-användare-tokens för ical-feed. Klartext visas EN gång vid skapande, sedan endast hash. Återkalla via UPDATE … SET revoked_at = now().';
