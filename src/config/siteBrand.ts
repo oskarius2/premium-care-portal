@@ -14,8 +14,11 @@ export const siteBrand = {
   metaDescription:
     "Novum — medicinsk skönhetsklinik med legitimerad personal. Botox med Dysport och fillers med Revolax Fine, alltid efter individuell konsultation.",
 
-  /** Behålls för ev. framtida användning i andra ytor */
-  logoPublicPath: null as string | null,
+  /**
+   * Fil i `public/` (utan inledande slash), t.ex. `novum-estetik-logo.png`.
+   * Bygg URL med `import.meta.env.BASE_URL` så det funkar vid `base` i Vite.
+   */
+  logoPublicPath: "novum-estetik-logo.png",
 } as const;
 
 /** Kort juridiskt/med.-informations disclaimer — återanvänd på landningssidor */

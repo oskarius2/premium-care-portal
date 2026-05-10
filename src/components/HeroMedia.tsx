@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-const LOOP_MP4 = `${import.meta.env.BASE_URL}hero/hero-loop.mp4`;
-const LOOP_WEBM = `${import.meta.env.BASE_URL}hero/hero-loop.webm`;
+const LOOP_MP4 = `${import.meta.env.BASE_URL}hero/hero-bg.mp4`;
+const LOOP_WEBM = `${import.meta.env.BASE_URL}hero/hero-bg.webm`;
 
 function usePrefersReducedMotion(): boolean {
   const [reduced, setReduced] = useState(() =>
@@ -22,22 +22,34 @@ function usePrefersReducedMotion(): boolean {
 type Props = {
   /** Bundlad poster (t.ex. importerad JPG/WebP) — visas som stillbild och som video-poster. */
   posterSrc: string;
+  /** Tom sträng för dekorativ bakgrund (t.ex. `variant="background"`). */
   alt: string;
+  /**
+   * `framed` — kort med ram (4:5), t.ex. i sidospalt.
+   * `background` — fyller föräldern (sätt `relative`/`absolute` runt med höjd); `object-cover`, lätt inzoom för mjuk kant.
+   */
+  variant?: "framed" | "background";
 };
 
 /**
- * Hero: spela loop från `public/hero/hero-loop.mp4` (+ valfri `hero-loop.webm`).
+ * Hero: spela loop från `public/hero/hero-bg.mp4` (+ valfri `hero-bg.webm`).
  * Saknas filer eller om användaren har `prefers-reduced-motion` → bara stillbilden.
  */
-export function HeroMedia({ posterSrc, alt }: Props) {
+export function HeroMedia({ posterSrc, alt, variant = "framed" }: Props) {
   const reducedMotion = usePrefersReducedMotion();
   const [videoFailed, setVideoFailed] = useState(false);
   const showVideo = !reducedMotion && !videoFailed;
+  const isBackground = variant === "background";
 
-  const shell =
-    "relative w-full aspect-[4/5] rounded-2xl border border-border/85 shadow-[var(--shadow-card)] overflow-hidden bg-muted";
+  const shell = isBackground
+    ? "relative h-full min-h-full w-full overflow-hidden bg-muted"
+    : "relative w-full aspect-[4/5] overflow-hidden bg-muted media-frame-lift";
 
-  const imgClass = "absolute inset-0 h-full w-full object-cover";
+  const imgClass = isBackground
+    ? "absolute inset-0 h-full w-full min-h-full object-cover object-center scale-[1.07]"
+    : "absolute inset-0 h-full w-full object-cover";
+
+  const stillAlt = isBackground && !alt.trim() ? "" : alt;
 
   return (
     <div className={shell}>
@@ -59,11 +71,12 @@ export function HeroMedia({ posterSrc, alt }: Props) {
       ) : (
         <img
           src={posterSrc}
-          alt={alt}
+          alt={stillAlt}
           className={imgClass}
           loading="eager"
           decoding="async"
           fetchPriority="high"
+          {...(isBackground ? { role: "presentation" } : {})}
         />
       )}
     </div>

@@ -12,7 +12,7 @@ export type Treatment = {
 };
 
 import imgFillers from "@/assets/treatments/treatment-belotero-revive.png";
-import imgBotox from "@/assets/treatments/treatment-profhilo.png";
+import imgBotox from "@/assets/treatments/treatment-hyalift-eyes.png";
 
 /** Synkad med `booking_treatments.slug` i Supabase */
 export const treatments: Treatment[] = [

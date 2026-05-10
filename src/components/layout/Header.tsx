@@ -38,6 +38,9 @@ const Header = () => {
   }, [open]);
 
   const ariaHome = `${siteBrand.name} — startsida`;
+  const logoSrc = siteBrand.logoPublicPath
+    ? `${import.meta.env.BASE_URL}${siteBrand.logoPublicPath.replace(/^\//, "")}`
+    : null;
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85 border-b border-border/75">
@@ -48,24 +51,37 @@ const Header = () => {
           onClick={() => setOpen(false)}
           aria-label={ariaHome}
         >
-          <span className="relative inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-2xl border border-primary/35 bg-white/85 text-primary shadow-[0_8px_20px_-14px_rgba(67,85,65,0.45)] shrink-0 overflow-hidden">
-            <span className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-primary/12" aria-hidden />
-            <span className="absolute -bottom-2 -right-1 w-5 h-5 rounded-full bg-accent/15" aria-hidden />
-            <span className="relative font-serif text-lg sm:text-xl md:text-[1.35rem] font-semibold tracking-tight leading-none">
-              N
-            </span>
-          </span>
-          <span className="flex flex-col items-start min-w-0">
-            <span className="font-serif text-[1.05rem] sm:text-[1.15rem] md:text-[1.4rem] tracking-[0.02em] text-primary font-semibold truncate max-w-[10rem] xs:max-w-[12rem] sm:max-w-none leading-none">
-              ovum
-            </span>
-            <span
-              className="text-[0.58rem] sm:text-[0.62rem] font-semibold uppercase tracking-[0.22em] sm:tracking-[0.24em] text-primary/75 mt-1 truncate max-w-[10rem] xs:max-w-[12rem] sm:max-w-none"
-              style={{ fontVariant: "small-caps" }}
-            >
-              {siteBrand.tagline}
-            </span>
-          </span>
+          {logoSrc ? (
+            <img
+              src={logoSrc}
+              alt=""
+              className="h-8 sm:h-9 md:h-11 w-auto max-w-[min(100%,12rem)] sm:max-w-[14rem] object-contain object-left shrink-0"
+              width={180}
+              height={44}
+              decoding="async"
+            />
+          ) : (
+            <>
+              <span className="relative inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-2xl border border-primary/35 bg-white/85 text-primary shadow-[0_8px_20px_-14px_rgba(67,85,65,0.45)] shrink-0 overflow-hidden">
+                <span className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-primary/12" aria-hidden />
+                <span className="absolute -bottom-2 -right-1 w-5 h-5 rounded-full bg-accent/15" aria-hidden />
+                <span className="relative font-serif text-lg sm:text-xl md:text-[1.35rem] font-semibold tracking-tight leading-none">
+                  N
+                </span>
+              </span>
+              <span className="flex flex-col items-start min-w-0">
+                <span className="font-serif text-[1.05rem] sm:text-[1.15rem] md:text-[1.4rem] tracking-[0.02em] text-primary font-semibold truncate max-w-[10rem] xs:max-w-[12rem] sm:max-w-none leading-none">
+                  ovum
+                </span>
+                <span
+                  className="text-[0.58rem] sm:text-[0.62rem] font-semibold uppercase tracking-[0.22em] sm:tracking-[0.24em] text-primary/75 mt-1 truncate max-w-[10rem] xs:max-w-[12rem] sm:max-w-none"
+                  style={{ fontVariant: "small-caps" }}
+                >
+                  {siteBrand.tagline}
+                </span>
+              </span>
+            </>
+          )}
         </Link>
 
         <nav className="hidden md:flex items-center gap-1" aria-label="Huvudmeny">

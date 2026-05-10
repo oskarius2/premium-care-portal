@@ -10,7 +10,10 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "figma:connect:create": "figma connect create",
+    "figma:connect:parse": "figma connect parse",
+    "figma:connect:publish": "figma connect publish"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.1",
@@ -26,6 +29,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
+    "@figma/code-connect": "^1.4.4",
     "@tailwindcss/typography": "^0.5.16",
     "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/react": "^16.0.0",
