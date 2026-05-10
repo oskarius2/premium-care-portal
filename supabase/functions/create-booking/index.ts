@@ -66,6 +66,13 @@ Deno.serve(async (req) => {
       return json({ error: "Ogiltigt tidsformat" }, 400);
     }
 
+    // Swedish law: 48 h reflection period for aesthetic treatments.
+    const BETANKETID_MS = 48 * 60 * 60 * 1000;
+    const slotDateTime = new Date(`${booking_date}T${start_time.length === 5 ? start_time + ":00" : start_time}`);
+    if (slotDateTime.getTime() - Date.now() < BETANKETID_MS) {
+      return json({ error: "Bokningen måste ligga minst 48 timmar fram i tiden (betänketid)" }, 400);
+    }
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
