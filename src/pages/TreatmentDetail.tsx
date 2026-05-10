@@ -1,106 +1,220 @@
-import { Link, useParams, Navigate } from "react-router-dom";
-import { Check, ArrowLeft, Calendar } from "lucide-react";
-import { treatments } from "@/data/treatments";
-import { siteMedicalDisclaimer } from "@/config/siteBrand";
-import { Ornament } from "@/components/ui/Ornament";
+import { useParams, Link } from "react-router-dom";
+import { Clock, Shield, FileText, AlertCircle, Calendar, ArrowLeft, Syringe, Activity } from "lucide-react";
+
+const treatmentsData = {
+  filler: {
+    name: "Fillers",
+    subtitle: "Revolax Fine – subtila volymer och fina linjer",
+    description: "Hyaluronsyra för att mjuka upp linjer, återställa volym och skapa ett naturligt harmoniskt ansiktsuttryck.",
+    duration: "Ca 45 minuter",
+    price: "Från 3 500 kr",
+    image: "https://i.imgur.com/C3mBqkF.jpeg",
+    icon: Syringe,
+    longDescription: `
+      Vi inleder alltid med en medicinsk konsultation där vi går igenom din hälsodeklaration,
+      tidigare estetiska ingrepp, allergier och läkemedel. Detta för att säkerställa att behandlingen är lämplig för just dig.
+    `,
+    whatIs: `
+      Revolax Fine är en hyaluronsyrabaserad filler avsedd för fina linjer och mer subtila volymjusteringar.
+      Hyaluronsyra är en naturligt förekommande substans i huden som binder vatten och ger volym.
+    `,
+    beforeTreatment: [
+      "Undvik blodförtunnande medicin (t.ex. Ipren, Aspirin, Omega-3) 1 vecka före behandling om möjligt (rådfråga din läkare).",
+      "Undvik alkohol 24 timmar före behandling – minskar risk för blåmärken och svullnad.",
+      "Berätta alltid om du haft herpes, autoimmuna sjukdomar, är gravid/ammar eller har pågående infektioner."
+    ],
+    afterTreatment: [
+      "Undvik att trycka eller massera behandlade områden de första 24 timmarna.",
+      "Undvik intensiv träning, bastu, solarium och sprit i minst 48 timmar efter behandling.",
+      "Lindrig rodnad, svullnad, ömhet eller blåmärken kan förekomma och brukar avta inom några dagar."
+    ],
+    risks: [
+      "Vanliga: Rodnad, svullnad, ömhet, blåmärken vid injektionsstället (oftast övergående).",
+      "Mindre vanliga: Knölar eller ojämnheter – går ofta att massera eller lösa upp vid behov.",
+      "Sällsynta men allvarliga: Infektion, kärlocklusion (kan påverka syn/hud). Vi arbetar aseptiskt för att minimera risker.",
+      "Alltid: Genomgång av risker, normala reaktioner och vad du ska göra vid ovanliga symtom."
+    ],
+    contraindications: [
+      "Graviditet eller amning",
+      "Aktiva infektioner eller inflammation i behandlingsområdet",
+      "Allergi mot hyaluronsyra eller lidokain",
+      "Autoimmuna sjukdomar eller blödningsrubbningar (individuell bedömning)"
+    ]
+  },
+  botox: {
+    name: "Botox",
+    subtitle: "Dysport – mjukare uttryck, naturligt resultat",
+    description: "Muskelavslappnande för att tillfälligt minska mimiska rynkor och skapa ett mer balanserat uttryck.",
+    duration: "Ca 30 minuter",
+    price: "Från 2 800 kr",
+    image: "https://i.imgur.com/J0FqQ4y.jpeg",
+    icon: Activity,
+    longDescription: `
+      Behandling med Dysport – ett botulinumtoxin-preparat som används för att tillfälligt minska aktiviteten
+      i utvalda mimiska muskler. Fokus ligger på ett naturligt och balanserat uttryck snarare än ett 'fryst' resultat.
+    `,
+    whatIs: `
+      Dysport är ett botulinumtoxin typ A som blockerar nervsignaler till musklerna. Detta gör att musklerna slappnar av,
+      vilket minskar uppkomsten av dynamiska rynkor (t.ex. pannrynkor, kräkbensrynkor).
+    `,
+    beforeTreatment: [
+      "Undvik blodförtunnande medicin 1 vecka före behandling (rådfråga din läkare).",
+      "Undvik alkohol 24 timmar före behandling – minskar risk för blåmärken.",
+      "Berätta om du haft neurologisk sjukdom, myasthenia gravis, är gravid/ammar eller har pågående infektion."
+    ],
+    afterTreatment: [
+      "Undvik att böja dig framåt eller ligga ner 4 timmar efter behandling.",
+      "Undvik intensiv träning, bastu, solarium och sprit i 24–48 timmar.",
+      "Undvik att massera eller trycka på behandlade områden (riskerar att sprida toxinet).",
+      "Fullt resultat syns efter ca 2 veckor – effekten varar 3–6 månader."
+    ],
+    risks: [
+      "Vanliga: Lindrig rodnad, svullnad, ömhet eller blåmärken vid injektionsstället.",
+      "Mindre vanliga: Huvudvärk, temporärt hängande ögonbryn eller ögonlock (övergående).",
+      "Sällsynta: Allergisk reaktion, infektion, påverkan på omkringliggande muskler.",
+      "Alltid: Genomgång av risker och vad du ska göra vid ovanliga symtom."
+    ],
+    contraindications: [
+      "Graviditet eller amning",
+      "Neuromuskulära sjukdomar (t.ex. myasthenia gravis)",
+      "Aktiva infektioner i behandlingsområdet",
+      "Allergi mot botulinumtoxin eller äggprotein (Dysport innehåller spår av mjölkprotein)"
+    ]
+  }
+};
 
 const TreatmentDetail = () => {
-  const { slug } = useParams();
-  const t = treatments.find((x) => x.slug === slug);
+  const { slug } = useParams<{ slug: string }>();
+  const treatment = slug === "filler" ? treatmentsData.filler : slug === "botox" ? treatmentsData.botox : null;
 
-  if (!t) return <Navigate to="/behandlingar" replace />;
-
-  return (
-    <article className="section-y-sm">
-      <div className="container-wide">
-        <Link
-          to="/behandlingar"
-          className="inline-flex items-center gap-2 text-[0.72rem] sm:text-[0.75rem] uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground transition-colors mb-6 sm:mb-8 md:mb-10"
-        >
-          <ArrowLeft size={14} strokeWidth={1.75} /> Alla behandlingar
-        </Link>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-16 items-start">
-          <img
-            src={t.image}
-            alt={t.name}
-            className="lg:col-span-7 w-full aspect-[4/5] object-cover media-frame"
-            loading="eager"
-            decoding="async"
-            fetchPriority="high"
-          />
-
-          <div className="lg:col-span-5">
-            <span className="eyebrow">{t.category}</span>
-
-            <Ornament
-              className="text-foreground/30 mt-4 sm:mt-5 mb-5 sm:mb-6"
-              width={72}
-              glyph="diamond"
-            />
-
-            <h1 className="heading-lg text-balance">{t.name}</h1>
-
-            <p className="font-serif italic text-[1.15rem] sm:text-xl md:text-2xl text-primary/80 leading-snug mt-3 max-w-md">
-              {t.tagline}
-            </p>
-
-            <p className="text-muted-foreground text-[0.95rem] sm:text-base md:text-[1.0625rem] leading-relaxed mt-5 sm:mt-7 max-w-prose">
-              {t.what}
-            </p>
-
-            <hr className="hairline my-6 sm:my-8" />
-
-            <p className="text-[0.7rem] uppercase tracking-[0.16em] text-muted-foreground mb-3 sm:mb-4">
-              Det här ingår
-            </p>
-            <ul className="space-y-2.5 mb-6 sm:mb-8">
-              {t.includes.map((item) => (
-                <li
-                  key={item}
-                  className="flex items-start gap-3 text-[0.92rem] sm:text-[0.9375rem] text-foreground/85 leading-relaxed"
-                >
-                  <Check size={15} strokeWidth={2} className="text-primary mt-0.5 shrink-0" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-
-            <hr className="hairline mb-6 sm:mb-7" />
-
-            <dl className="grid grid-cols-2 gap-3 sm:gap-6 mb-6 sm:mb-8">
-              <div className="rounded-2xl border border-border/75 bg-card px-4 sm:px-0 py-3.5 sm:py-0 sm:border-0">
-                <dt className="text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.16em] text-muted-foreground mb-1">
-                  Tidsåtgång
-                </dt>
-                <dd className="font-serif text-[1.05rem] sm:text-xl text-foreground">
-                  {t.duration}
-                </dd>
-              </div>
-              <div className="rounded-2xl border border-border/75 bg-card px-4 sm:px-0 py-3.5 sm:py-0 sm:border-0">
-                <dt className="text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.16em] text-muted-foreground mb-1">
-                  Pris
-                </dt>
-                <dd className="font-serif text-[1.05rem] sm:text-xl text-foreground">
-                  {t.price}
-                </dd>
-              </div>
-            </dl>
-
-            <Link
-              to={`/boka?treatment=${encodeURIComponent(t.slug)}`}
-              className="btn-primary btn-large w-full sm:w-auto justify-center"
-            >
-              <Calendar size={20} strokeWidth={1.75} /> Boka tid
-            </Link>
-
-            <p className="text-[0.72rem] sm:text-xs text-muted-foreground mt-8 sm:mt-10 max-w-xl leading-relaxed border-t border-border/75 pt-6 sm:pt-7">
-              {siteMedicalDisclaimer} Produktnamn och beskrivningar är översiktliga; exakt indikation och kontraindikationer enligt aktuellt informationsmaterial tillämpas vid konsultation.
-            </p>
-          </div>
+  if (!treatment) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "hsl(44, 30%, 97%)" }}>
+        <div className="text-center">
+          <h1 className="text-2xl font-serif mb-4">Behandlingen hittades inte</h1>
+          <Link to="/behandlingar" className="text-sm underline">Tillbaka till behandlingar</Link>
         </div>
       </div>
-    </article>
+    );
+  }
+
+  const Icon = treatment.icon;
+
+  return (
+    <div className="min-h-screen" style={{ backgroundColor: "hsl(44, 30%, 97%)" }}>
+      
+      {/* Hero */}
+      <section className="relative h-[50vh] min-h-[400px] flex items-end pb-12 px-4">
+        <div className="absolute inset-0 z-0">
+          <img src={treatment.image} alt={treatment.name} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
+        </div>
+        <div className="relative z-10 max-w-5xl mx-auto w-full">
+          <Link to="/behandlingar" className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-6 text-sm">
+            <ArrowLeft className="w-4 h-4" /> Tillbaka till behandlingar
+          </Link>
+          <div className="flex items-center gap-3 mb-3">
+            <Icon className="w-8 h-8 text-white" />
+            <span className="text-white/80 text-sm uppercase tracking-wider">Behandling</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-light text-white mb-3">{treatment.name}</h1>
+          <p className="text-xl text-white/90 max-w-2xl">{treatment.subtitle}</p>
+        </div>
+      </section>
+
+      {/* Kort info */}
+      <section className="py-10 px-4 border-b" style={{ backgroundColor: "hsl(0, 0%, 100%)", borderColor: "hsl(42, 22%, 80%)" }}>
+        <div className="max-w-5xl mx-auto flex flex-wrap gap-8 justify-between items-center">
+          <div className="flex items-center gap-3">
+            <Clock className="w-5 h-5" style={{ color: "hsl(96, 15%, 33%)" }} />
+            <div>
+              <p className="text-sm" style={{ color: "hsl(94, 8%, 42%)" }}>Behandlingstid</p>
+              <p className="font-medium" style={{ color: "hsl(94, 10%, 24%)" }}>{treatment.duration}</p>
+            </div>
+          </div>
+          <div className="w-px h-8" style={{ backgroundColor: "hsl(42, 22%, 80%)" }} />
+          <div className="flex items-center gap-3">
+            <Calendar className="w-5 h-5" style={{ color: "hsl(96, 15%, 33%)" }} />
+            <div>
+              <p className="text-sm" style={{ color: "hsl(94, 8%, 42%)" }}>Pris från</p>
+              <p className="font-medium" style={{ color: "hsl(94, 10%, 24%)" }}>{treatment.price}</p>
+            </div>
+          </div>
+          <Link to="/boka" className="px-6 py-2.5 rounded-full text-sm font-medium transition" style={{ backgroundColor: "hsl(96, 15%, 33%)", color: "white" }}>
+            Boka konsultation
+          </Link>
+        </div>
+      </section>
+
+      {/* Innehåll */}
+      <section className="py-16 px-4 max-w-5xl mx-auto">
+        <div className="space-y-12">
+          
+          {/* Vad är */}
+          <div>
+            <h2 className="text-2xl font-serif mb-4" style={{ color: "hsl(94, 10%, 24%)" }}>Vad är {treatment.name}?</h2>
+            <p className="leading-relaxed" style={{ color: "hsl(94, 8%, 42%)" }}>{treatment.whatIs}</p>
+          </div>
+
+          {/* Behandlingen */}
+          <div>
+            <h2 className="text-2xl font-serif mb-4" style={{ color: "hsl(94, 10%, 24%)" }}>Om behandlingen</h2>
+            <p className="leading-relaxed" style={{ color: "hsl(94, 8%, 42%)" }}>{treatment.longDescription}</p>
+          </div>
+
+          {/* Före */}
+          <div className="rounded-xl p-6" style={{ backgroundColor: "hsl(44, 28%, 92%)" }}>
+            <h3 className="font-semibold text-lg mb-3 flex items-center gap-2" style={{ color: "hsl(94, 10%, 24%)" }}>
+              <Shield className="w-5 h-5" /> Inför behandlingen
+            </h3>
+            <ul className="space-y-2 list-disc list-inside" style={{ color: "hsl(94, 8%, 42%)" }}>
+              {treatment.beforeTreatment.map((item, i) => (
+                <li key={i} className="text-sm">{item}</li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Efter */}
+          <div className="rounded-xl p-6" style={{ backgroundColor: "hsl(44, 28%, 92%)" }}>
+            <h3 className="font-semibold text-lg mb-3 flex items-center gap-2" style={{ color: "hsl(94, 10%, 24%)" }}>
+              <FileText className="w-5 h-5" /> Eftervård & återhämtning
+            </h3>
+            <ul className="space-y-2 list-disc list-inside" style={{ color: "hsl(94, 8%, 42%)" }}>
+              {treatment.afterTreatment.map((item, i) => (
+                <li key={i} className="text-sm">{item}</li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Risker */}
+          <div className="rounded-xl p-6 border" style={{ borderColor: "hsl(42, 22%, 80%)" }}>
+            <h3 className="font-semibold text-lg mb-3 flex items-center gap-2" style={{ color: "hsl(94, 10%, 24%)" }}>
+              <AlertCircle className="w-5 h-5" /> Risker & biverkningar
+            </h3>
+            <ul className="space-y-2 list-disc list-inside" style={{ color: "hsl(94, 8%, 42%)" }}>
+              {treatment.risks.map((item, i) => (
+                <li key={i} className="text-sm">{item}</li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Kontraindikationer */}
+          <div>
+            <h3 className="font-semibold text-lg mb-3" style={{ color: "hsl(94, 10%, 24%)" }}>När rekommenderas inte behandling?</h3>
+            <ul className="space-y-2 list-disc list-inside" style={{ color: "hsl(94, 8%, 42%)" }}>
+              {treatment.contraindications.map((item, i) => (
+                <li key={i} className="text-sm">{item}</li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Disclaimer */}
+          <div className="text-xs italic pt-6 border-t" style={{ color: "hsl(94, 8%, 42%)", borderColor: "hsl(42, 22%, 80%)" }}>
+            <p>Informationen på webbplatsen är av allmän karaktär och ersätter inte individuell medicinsk bedömning, diagnostik eller behandlingsråd. Resultat av estetiska ingrepp varierar mellan individer och kan inte garanteras.</p>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 };
 
