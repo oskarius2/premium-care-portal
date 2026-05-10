@@ -2,6 +2,12 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Shield, FileText, Sparkles, Syringe, Activity, ChevronDown, Clock, Calendar, MapPin } from "lucide-react";
 
+// Proxy-funktion för att ladda Imgur-bilder
+const proxyImage = (url: string) => {
+  const encoded = encodeURIComponent(url);
+  return `https://images.weserv.nl/?url=${encoded}`;
+};
+
 const Index = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
@@ -16,14 +22,19 @@ const Index = () => {
     { q: "Varför är tonen så medicinsk?", a: "För att injektionsbehandling är vårdnära. Den kan vara varm och välkomnande – men ska kännas seriös och trygg." }
   ];
 
+  // Era bilder med proxy
+  const heroImage = proxyImage("https://i.imgur.com/2RgBQAd.jpeg");
+  const fillerImage = proxyImage("https://i.imgur.com/C3mBqkF.jpeg");
+  const botoxImage = proxyImage("https://i.imgur.com/J0FqQ4y.jpeg");
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: "hsl(44, 30%, 97%)" }}>
       
-      {/* HERO – med er bild */}
+      {/* HERO – med er bild via proxy */}
       <section className="relative h-screen min-h-[600px] flex items-center justify-center px-4">
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://i.imgur.com/2RgBQAd.jpeg" 
+            src={heroImage}
             alt="Novum Estetik klinikmiljö"
             className="w-full h-full object-cover"
           />
@@ -62,7 +73,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* BEHANDLINGAR – exklusiva kort */}
+      {/* BEHANDLINGAR */}
       <section className="py-24 px-4" style={{ backgroundColor: "hsl(0, 0%, 100%)" }}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
@@ -83,7 +94,7 @@ const Index = () => {
             >
               <div className="h-64 overflow-hidden">
                 <img 
-                  src="https://i.imgur.com/C3mBqkF.jpeg" 
+                  src={fillerImage}
                   alt="Fillers behandling"
                   className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                 />
@@ -107,7 +118,7 @@ const Index = () => {
             >
               <div className="h-64 overflow-hidden">
                 <img 
-                  src="https://i.imgur.com/J0FqQ4y.jpeg" 
+                  src={botoxImage}
                   alt="Botox behandling"
                   className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                 />
@@ -127,7 +138,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* VÅR VÅRD – medicinska certifieringar */}
+      {/* VÅR VÅRD */}
       <section className="py-20 px-4" style={{ backgroundColor: "hsl(44, 28%, 92%)" }}>
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-3xl font-serif font-light mb-12" style={{ color: "hsl(94, 10%, 24%)" }}>
@@ -159,7 +170,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* PROCESS – enkel och tydlig */}
+      {/* PROCESS */}
       <section className="py-20 px-4" style={{ backgroundColor: "hsl(0, 0%, 100%)" }}>
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-serif font-light mb-12" style={{ color: "hsl(94, 10%, 24%)" }}>
@@ -198,7 +209,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* FAQ – accordion */}
+      {/* FAQ */}
       <section className="py-20 px-4" style={{ backgroundColor: "hsl(44, 28%, 92%)" }}>
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl font-serif font-light text-center mb-12" style={{ color: "hsl(94, 10%, 24%)" }}>
@@ -226,7 +237,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* KONTAKT & CTA */}
+      {/* KONTAKT */}
       <section className="py-20 px-4 text-center" style={{ backgroundColor: "hsl(96, 15%, 33%)", color: "white" }}>
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl font-serif font-light mb-4">Redo att ta nästa steg?</h2>
