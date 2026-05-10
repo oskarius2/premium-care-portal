@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-const LOOP_MP4 = `${import.meta.env.BASE_URL}hero/hero-loop.mp4`;
-const LOOP_WEBM = `${import.meta.env.BASE_URL}hero/hero-loop.webm`;
+const LOOP_MP4 = `${import.meta.env.BASE_URL}hero/hero-bg.mp4`;
+const LOOP_WEBM = `${import.meta.env.BASE_URL}hero/hero-bg.webm`;
 
 function usePrefersReducedMotion(): boolean {
   const [reduced, setReduced] = useState(() =>
@@ -26,7 +26,7 @@ type Props = {
 };
 
 /**
- * Hero: spela loop från `public/hero/hero-loop.mp4` (+ valfri `hero-loop.webm`).
+ * Hero: spela loop från `public/hero/hero-bg.mp4` (+ valfri `hero-bg.webm`).
  * Saknas filer eller om användaren har `prefers-reduced-motion` → bara stillbilden.
  */
 export function HeroMedia({ posterSrc, alt }: Props) {
