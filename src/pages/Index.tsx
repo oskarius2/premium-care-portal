@@ -1,40 +1,181 @@
+import { useState } from "react";
+import { ChevronDown, Sparkles, Shield, Clock, Syringe, Activity } from "lucide-react";
 import { Link } from "react-router-dom";
-import {
-  Calendar,
-  MapPin,
-  Clock,
-  Stethoscope,
-  ClipboardCheck,
-  ShieldCheck,
-  Sparkles,
-  ArrowUpRight,
-  Check,
-  ScanLine,
-} from "lucide-react";
-import heroImg from "@/assets/clinic/hero-clinic.png";
-import clinicInterior from "@/assets/about/about-clinic.png";
-import { siteBrand, siteMedicalDisclaimer } from "@/config/siteBrand";
-import { siteContact } from "@/config/siteContact";
-import { Ornament } from "@/components/ui/Ornament";
-import { SectionHeader } from "@/components/ui/SectionHeader";
-import { treatments } from "@/data/treatments";
 
-const heroTrust = [
-  { icon: Stethoscope, label: "Legitimerad personal" },
-  { icon: ClipboardCheck, label: "Medicinsk konsultation" },
-  { icon: ShieldCheck, label: "Journalförd vård" },
-];
+const Index = () => {
+  const [openSections, setOpenSections] = useState({
+    process: false,
+    faq: false,
+    clinic: false
+  });
 
-const signaturePillars = [
-  {
-    icon: Stethoscope,
-    title: "Medicinsk kompetens",
-    body: "Bedömning, behandling och uppföljning hålls samman i samma kliniska flöde — utan att det känns kallt eller opersonligt.",
-  },
-  {
-    icon: ScanLine,
-    title: "Naturlig strategi",
-    body: "Fokus ligger på hudkvalitet, struktur och harmoni över tid, inte på snabba eller överdrivna förändringar.",
+  const toggleSection = (section: keyof typeof openSections) => {
+    setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* HERO - Kort och kraftfull */}
+      <section className="relative px-4 py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white">
+        <div className="max-w-6xl mx-auto text-center">
+          <h1 className="text-4xl md:text-6xl font-serif font-light tracking-tight text-gray-900">
+            Novum Estetik
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-600 mt-4 max-w-2xl mx-auto">
+            Premium känsla. Medicinsk ryggrad.
+          </p>
+          <div className="flex flex-wrap gap-3 justify-center mt-8">
+            <Link to="/boka" className="px-6 py-3 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition">
+              Boka konsultation
+            </Link>
+            <Link to="/behandlingar" className="px-6 py-3 border border-gray-300 rounded-full hover:border-gray-900 transition">
+              Våra behandlingar
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 3 KORTA USP-SEKTIONER */}
+      <section className="py-12 px-4 border-b border-gray-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center p-4">
+              <Shield className="w-10 h-10 mx-auto text-gray-700 mb-3" />
+              <h3 className="font-semibold text-lg">Legitimerad personal</h3>
+              <p className="text-gray-600 text-sm">Alltid med medicinsk kompetens</p>
+            </div>
+            <div className="text-center p-4">
+              <Clipboard className="w-10 h-10 mx-auto text-gray-700 mb-3" />
+              <h3 className="font-semibold text-lg">Journalförd vård</h3>
+              <p className="text-gray-600 text-sm">Dokumentation enligt GDPR</p>
+            </div>
+            <div className="text-center p-4">
+              <Clock className="w-10 h-10 mx-auto text-gray-700 mb-3" />
+              <h3 className="font-semibold text-lg">Lugn miljö</h3>
+              <p className="text-gray-600 text-sm">Ingen stress – bara trygghet</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* BEHANDLINGAR – Horisontellt scrollande på mobil */}
+      <section className="py-12 px-4">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-2xl font-serif text-center mb-8">Våra behandlingar</h2>
+          <div className="overflow-x-auto pb-4 -mx-4 px-4">
+            <div className="flex gap-4 md:grid md:grid-cols-2 md:gap-6 md:overflow-visible" style={{ minWidth: "max-content" }}>
+              <Link to="/behandlingar/filler" className="block w-72 md:w-auto bg-gray-50 rounded-2xl p-6 hover:shadow-lg transition">
+                <Syringe className="w-8 h-8 text-gray-700 mb-3" />
+                <h3 className="font-semibold text-xl">Fillers</h3>
+                <p className="text-gray-600 text-sm mt-2">Revolax Fine – subtila volymer</p>
+                <span className="inline-block mt-3 text-sm font-medium text-gray-900">Läs mer →</span>
+              </Link>
+              <Link to="/behandlingar/botox" className="block w-72 md:w-auto bg-gray-50 rounded-2xl p-6 hover:shadow-lg transition">
+                <Activity className="w-8 h-8 text-gray-700 mb-3" />
+                <h3 className="font-semibold text-xl">Botox</h3>
+                <p className="text-gray-600 text-sm mt-2">Dysport – naturligt uttryck</p>
+                <span className="inline-block mt-3 text-sm font-medium text-gray-900">Läs mer →</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ACCORDION – Process (hopfällbar) */}
+      <section className="py-6 px-4 border-t border-gray-100">
+        <div className="max-w-3xl mx-auto">
+          <button
+            onClick={() => toggleSection("process")}
+            className="w-full flex justify-between items-center py-6 text-left font-serif text-xl"
+          >
+            <span>Vår process</span>
+            <ChevronDown className={`w-5 h-5 transition-transform ${openSections.process ? "rotate-180" : ""}`} />
+          </button>
+          {openSections.process && (
+            <div className="pb-6 space-y-4 text-gray-600">
+              <div className="flex gap-3">
+                <span className="font-bold text-gray-900">01.</span>
+                <span><strong>Första kontakt</strong> – Boka online, läs in dig på behandlingarna.</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="font-bold text-gray-900">02.</span>
+                <span><strong>Konsultation</strong> – Genomgång av mål, hudstatus och rimliga förväntningar.</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="font-bold text-gray-900">03.</span>
+                <span><strong>Behandling</strong> – Aseptisk teknik, dokumentation och trygg vägledning.</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="font-bold text-gray-900">04.</span>
+                <span><strong>Eftervård</strong> – Konkreta råd och tydlig kontaktväg.</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ACCORDION – FAQ */}
+      <section className="py-6 px-4 border-t border-gray-100">
+        <div className="max-w-3xl mx-auto">
+          <button
+            onClick={() => toggleSection("faq")}
+            className="w-full flex justify-between items-center py-6 text-left font-serif text-xl"
+          >
+            <span>Vanliga frågor</span>
+            <ChevronDown className={`w-5 h-5 transition-transform ${openSections.faq ? "rotate-180" : ""}`} />
+          </button>
+          {openSections.faq && (
+            <div className="pb-6 space-y-4 text-gray-600">
+              <div>
+                <strong>Hur vet jag vilken behandling som passar mig?</strong>
+                <p className="mt-1 text-sm">Det avgörs i konsultationen utifrån din hud, anatomi och mål.</p>
+              </div>
+              <div>
+                <strong>Kommer resultatet att se naturligt ut?</strong>
+                <p className="mt-1 text-sm">Ja – vi fokuserar på gradvisa förbättringar, inte hårda förändringar.</p>
+              </div>
+              <div>
+                <strong>Vad händer om jag bokar "fel" behandling?</strong>
+                <p className="mt-1 text-sm">Planen justeras efter medicinsk bedömning – din preliminära bokning är bara första steget.</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ACCORDION – Klinikinfo */}
+      <section className="py-6 px-4 border-t border-gray-100">
+        <div className="max-w-3xl mx-auto">
+          <button
+            onClick={() => toggleSection("clinic")}
+            className="w-full flex justify-between items-center py-6 text-left font-serif text-xl"
+          >
+            <span>Kliniken</span>
+            <ChevronDown className={`w-5 h-5 transition-transform ${openSections.clinic ? "rotate-180" : ""}`} />
+          </button>
+          {openSections.clinic && (
+            <div className="pb-6 space-y-2 text-gray-600">
+              <p><strong>Adress:</strong> Rådhusgatan 64, 831 34 Östersund</p>
+              <p><strong>Miljö:</strong> Lugn, genomtänkt och medicinskt trygg.</p>
+              <p className="text-sm mt-4 italic">Informationen på webbplatsen ersätter inte individuell medicinsk bedömning.</p>
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+};
+
+// Hjälpkomponent för Clipboard (om du inte redan har den importerad)
+const Clipboard = (props: any) => {
+  return (
+    <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  );
+};
+
+export default Index;    body: "Fokus ligger på hudkvalitet, struktur och harmoni över tid, inte på snabba eller överdrivna förändringar.",
   },
   {
     icon: ShieldCheck,
