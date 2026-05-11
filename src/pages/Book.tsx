@@ -20,6 +20,7 @@ import { sv } from "date-fns/locale";
 import { format as formatDate, addHours, startOfDay } from "date-fns";
 import "react-day-picker/dist/style.css";
 import { treatments, type Treatment } from "@/data/treatments";
+import { siteBookingNotice } from "@/config/siteBrand";
 import { siteContact } from "@/config/siteContact";
 import { TelLink } from "@/components/ContactAnchors";
 
@@ -62,7 +63,7 @@ type BookingState = {
 type DbTreatmentRef = { id: string; slug: string };
 
 const STEPS: { id: Step; label: string; short: string }[] = [
-  { id: "treatment", label: "Behandling", short: "Val" },
+  { id: "treatment", label: "Konsultation", short: "Val" },
   { id: "date", label: "Dag", short: "Dag" },
   { id: "time", label: "Tid", short: "Tid" },
   { id: "details", label: "Dina uppgifter", short: "Uppg." },
@@ -216,7 +217,7 @@ export default function Book() {
       setState((s) => ({ ...s, treatmentId }));
     }
     if (!treatmentId) {
-      setError("V\u00e4lj behandling f\u00f6rst.");
+      setError("V\u00e4lj konsultation f\u00f6rst.");
       return;
     }
     const ok = await loadSlotsFor(date, treatmentId);
@@ -262,10 +263,11 @@ export default function Book() {
       <div className="container-page">
         {/* Sidhuvud */}
         <div className="max-w-2xl mb-8 md:mb-12">
-          <span className="eyebrow mb-3">Boka tid</span>
-          <h1 className="heading-lg">Boka din tid hos oss</h1>
+          <span className="eyebrow mb-3">Boka konsultation</span>
+          <h1 className="heading-lg">Boka din konsultation hos oss</h1>
           <p className="lead mt-3">
-            Fyra korta steg. Vi återkommer via mejl när bokningen är bekräftad.
+            Fyra korta steg. Första bokningstillfället är konsultation och information
+            inför eventuell behandling.
           </p>
         </div>
 
@@ -275,13 +277,19 @@ export default function Book() {
         {/* Layout: huvudinnehåll + sticky summary */}
         <div className="mt-8 md:mt-12 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-12">
           <div className="min-w-0">
-            {/* STEG: Behandling */}
+            {/* STEG: Konsultation */}
             {step === "treatment" && (
               <StepShell
                 eyebrow="Steg 1 av 4"
-                title="Vilken behandling vill du boka?"
-                description="Välj ett alternativ — du kan alltid byta i nästa steg eller avboka kostnadsfritt fram till 24 h innan."
+                title="Vad vill du boka konsultation för?"
+                description="Välj det område du vill prata om. Valet är inte ett beslut om behandling."
               >
+                <div className="flex items-start gap-3 bg-primary/5 border border-primary/20 rounded-xl p-4 mb-4">
+                  <ShieldCheck size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {siteBookingNotice}
+                  </p>
+                </div>
                 <ul className="space-y-3">
                   {treatments.map((t) => (
                     <li key={t.slug}>
@@ -306,7 +314,7 @@ export default function Book() {
                           </p>
                           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground mt-2">
                             <span className="inline-flex items-center gap-1.5">
-                              <Clock size={14} className="text-primary" /> {t.duration}
+                              <ShieldCheck size={14} className="text-primary" /> Konsultation först
                             </span>
                             <span className="inline-flex items-center gap-1.5">
                               <Tag size={14} className="text-primary" /> {t.price}
@@ -328,17 +336,17 @@ export default function Book() {
             {step === "date" && (
               <StepShell
                 eyebrow="Steg 2 av 4"
-                title="Välj en dag"
-                description={`För ${state.treatmentName}${
-                  selectedTreatment ? ` · ${selectedTreatment.duration.toLowerCase()}` : ""
-                }`}
+                title="Välj dag för konsultation"
+                description={`För ${state.treatmentName}`}
               >
                 <div className="flex items-start gap-3 bg-primary/5 border border-primary/20 rounded-xl p-4 mb-4">
                   <ShieldCheck size={18} className="mt-0.5 shrink-0 text-primary" />
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Enligt svensk lag gäller <strong className="text-foreground">48 timmars betänketid</strong> för
-                    estetiska behandlingar. Tidigaste möjliga bokningsdag
-                    är <strong className="text-foreground">{formatShortDate(minBookableDate)}</strong>.
+                    För estetiska behandlingar gäller{" "}
+                    <strong className="text-foreground">48 timmars betänketid</strong> efter
+                    konsultation och information. Första besöket är konsultation; tidigaste
+                    möjliga dag i onlinebokningen är{" "}
+                    <strong className="text-foreground">{formatShortDate(minBookableDate)}</strong>.
                   </p>
                 </div>
                 <div className="bg-card rounded-2xl border border-border shadow-[var(--shadow-card)] p-3 sm:p-6">
@@ -391,7 +399,7 @@ export default function Book() {
                 title="Välj en tid"
                 description={
                   state.date
-                    ? `${formatLongDate(state.date)} · ${state.treatmentName}`
+                    ? `${formatLongDate(state.date)} · konsultation för ${state.treatmentName}`
                     : state.treatmentName
                 }
               >
@@ -449,7 +457,7 @@ export default function Book() {
               <StepShell
                 eyebrow="Steg 4 av 4"
                 title="Dina uppgifter"
-                description="Vi använder uppgifterna enbart för att bekräfta din bokning och skicka påminnelse."
+                description="Vi använder uppgifterna enbart för att bekräfta din konsultation och skicka påminnelse."
               >
                 <div className="bg-card rounded-2xl border border-border shadow-[var(--shadow-card)] p-5 sm:p-7 space-y-5">
                   <Field
@@ -506,7 +514,7 @@ export default function Book() {
                   <p className="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed pt-1">
                     <ShieldCheck size={14} className="text-primary mt-0.5 shrink-0" />
                     <span>
-                      Vi behandlar uppgifterna enligt GDPR. Inga reklamutskick — bara bokning och eventuell uppföljning.
+                      Vi behandlar uppgifterna enligt GDPR. Inga reklamutskick — bara konsultation och eventuell uppföljning.
                     </span>
                   </p>
                 </div>
@@ -526,7 +534,7 @@ export default function Book() {
                       </>
                     ) : (
                       <>
-                        Bekräfta bokning <Check size={20} />
+                        Bekräfta konsultation <Check size={20} />
                       </>
                     )}
                   </button>
@@ -678,7 +686,7 @@ function BookingSummary({
     <aside className="lg:sticky lg:top-28">
       <div className="bg-card rounded-2xl border border-border shadow-[var(--shadow-card)] p-5 sm:p-6">
         <p className="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-primary/80 mb-4">
-          Din bokning
+          Din konsultation
         </p>
 
         {treatment ? (
@@ -691,13 +699,13 @@ function BookingSummary({
             <div className="min-w-0">
               <p className="font-serif text-lg leading-tight tracking-tight">{treatment.name}</p>
               <p className="text-xs text-muted-foreground mt-1 truncate">
-                {treatment.category} · {treatment.duration}
+                {treatment.category} · konsultation först
               </p>
             </div>
           </div>
         ) : (
           <p className="text-sm text-muted-foreground mb-5 pb-5 border-b border-border">
-            Ingen behandling vald än.
+            Ingen konsultation vald än.
           </p>
         )}
 
@@ -718,7 +726,8 @@ function BookingSummary({
         </ul>
 
         <p className="text-[0.7rem] text-muted-foreground mt-6 leading-relaxed">
-          Pris efter konsultation. Avboka kostnadsfritt fram till 24 timmar innan.
+          Första besöket är konsultation. Eventuell behandling planeras efter konsultation
+          och 48 timmars betänketid.
         </p>
       </div>
 
@@ -792,7 +801,7 @@ function Confirmation({
             <Check size={32} strokeWidth={2.25} />
           </span>
           <p className="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-primary/80 mb-3">
-            Bokning bekräftad
+            Konsultation bekräftad
           </p>
           <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl leading-[1.05] tracking-tight">
             Tack — vi ses snart.
@@ -806,7 +815,7 @@ function Confirmation({
 
         <div className="bg-card rounded-2xl border border-border shadow-[var(--shadow-card)] p-6 sm:p-8">
           <p className="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-primary/80 mb-5">
-            Din bokning
+            Din konsultation
           </p>
 
           <div className="grid sm:grid-cols-[auto_1fr] gap-4 sm:gap-6 items-start">
@@ -820,12 +829,12 @@ function Confirmation({
             <div className="space-y-4">
               <div>
                 <p className="text-[0.65rem] uppercase tracking-[0.16em] text-muted-foreground mb-1">
-                  Behandling
+                  Konsultation om
                 </p>
                 <p className="font-serif text-2xl tracking-tight">{state.treatmentName}</p>
                 {treatment && (
                   <p className="text-sm text-muted-foreground mt-1">
-                    {treatment.category} · {treatment.duration}
+                    {treatment.category} · konsultation först
                   </p>
                 )}
               </div>
@@ -856,7 +865,8 @@ function Confirmation({
         </div>
 
         <p className="text-xs text-muted-foreground text-center mt-8 leading-relaxed max-w-md mx-auto">
-          Behöver du ändra eller avboka? Hör av dig i god tid före ditt besök så hjälper vi dig vidare.
+          Det bekräftade besöket gäller konsultation och viktig information. Eventuell behandling
+          bokas först efter konsultation och 48 timmars betänketid.
         </p>
       </div>
     </section>

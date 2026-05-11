@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Calendar, Clock } from "lucide-react";
 import { treatments } from "@/data/treatments";
-import { siteMedicalDisclaimer } from "@/config/siteBrand";
+import { siteBookingNotice, siteMedicalDisclaimer } from "@/config/siteBrand";
 import { Ornament } from "@/components/ui/Ornament";
 
 const Pricing = () => {
@@ -22,7 +22,7 @@ const Pricing = () => {
           </h1>
 
           <p className="lead mt-5 md:mt-7 max-w-2xl">
-            Pris ges efter individuell bedömning eftersom rätt preparat, mängd och antal tillfällen varierar mellan personer. Konsultationen är förbehållslös.
+            Pris ges efter individuell bedömning eftersom rätt preparat, mängd och antal tillfällen varierar mellan personer. Första bokningen är konsultation och information; behandling planeras först efter 48 timmars betänketid.
           </p>
         </div>
       </section>
@@ -67,7 +67,7 @@ const Pricing = () => {
           </ul>
 
           <p className="text-sm text-muted-foreground leading-relaxed mt-8 max-w-2xl">
-            {siteMedicalDisclaimer}
+            {siteBookingNotice} {siteMedicalDisclaimer}
           </p>
 
           <div className="text-center mt-12 md:mt-16">

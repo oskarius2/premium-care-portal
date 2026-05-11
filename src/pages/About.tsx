@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Calendar } from "lucide-react";
-import { siteBrand, siteMedicalDisclaimer } from "@/config/siteBrand";
+import { siteBookingNotice, siteBrand, siteMedicalDisclaimer } from "@/config/siteBrand";
 import { siteContact } from "@/config/siteContact";
 import interior from "@/assets/about/about-clinic.png";
 import consultationNook from "@/assets/clinic/about-consult-nook.png";
@@ -13,7 +13,7 @@ const expectations = [
   },
   {
     title: "Konsultation före ingrepp",
-    body: "Vi går igenom hälsodeklaration, läkemedel, tidigare ingrepp och dina förväntningar. Inget ingrepp utan att du förstått vad som är rimligt, vad som kan hända direkt efteråt och när du ska höra av dig till oss.",
+    body: "Vi går igenom hälsodeklaration, läkemedel, tidigare ingrepp och dina förväntningar. Första bokningstillfället är konsultation och information; därefter gäller 48 timmars betänketid innan eventuell behandling.",
   },
   {
     title: "Struktur & integritet",
@@ -122,7 +122,7 @@ const About = () => {
           </ol>
 
           <p className="text-center text-sm text-muted-foreground mt-10 max-w-2xl mx-auto leading-relaxed">
-            {siteMedicalDisclaimer}
+            {siteBookingNotice} {siteMedicalDisclaimer}
           </p>
         </div>
       </section>
@@ -147,7 +147,7 @@ const About = () => {
             </p>
 
             <Link to="/boka" className="btn-primary btn-large mt-9">
-              <Calendar size={20} strokeWidth={1.75} /> Boka konsultation eller tid
+              <Calendar size={20} strokeWidth={1.75} /> Boka konsultation
             </Link>
           </div>
 
