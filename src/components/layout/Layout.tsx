@@ -2,6 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
+import MobileNav from "./MobileNav";
 
 const Layout = () => {
   const { pathname } = useLocation();
@@ -17,6 +18,9 @@ const Layout = () => {
         <Outlet />
       </main>
       <Footer />
+      <MobileNav />
+      {/* Spacer so bottom nav doesn't cover footer content on mobile */}
+      <div className="md:hidden h-16" aria-hidden />
     </div>
   );
 };

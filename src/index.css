@@ -297,6 +297,11 @@
   .no-ios-zoom {
     font-size: 16px;
   }
+
+  /* Safe-area padding for bottom nav on notched devices */
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
 }
 
 /* react-day-picker — låt våra Tailwind classNames vinna över bibliotekets default-stilar.
