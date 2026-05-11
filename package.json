@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:booking": "node scripts/booking-smoke-test.mjs",
     "test:watch": "vitest",
     "figma:connect:create": "figma connect create",
     "figma:connect:parse": "figma connect parse",

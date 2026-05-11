@@ -177,6 +177,9 @@ Deno.serve(async (req) => {
 
     if (bErr || !inserted || inserted.length === 0) {
       console.error("Booking insert error:", bErr);
+      if (bErr?.code === "23P01" || bErr?.message?.includes("bookings_no_overlapping_active_times")) {
+        return json({ error: "Tiden är inte längre tillgänglig" }, 409);
+      }
       return json({ error: "Kunde inte skapa bokning" }, 500);
     }
 

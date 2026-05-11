@@ -38,11 +38,28 @@ const BETANKETID_HOURS = 48;
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-const fn = (name: string) => `${SUPABASE_URL}/functions/v1/${name}`;
-const headers = {
-  apikey: SUPABASE_KEY,
-  Authorization: `Bearer ${SUPABASE_KEY}`,
-  "Content-Type": "application/json",
+const SUPABASE_CONFIG_ERROR =
+  "Bokningssystemet saknar Supabase-konfiguration. Kontrollera VITE_SUPABASE_URL och VITE_SUPABASE_PUBLISHABLE_KEY.";
+
+const getSupabaseConfig = () => {
+  const url = typeof SUPABASE_URL === "string" ? SUPABASE_URL.trim().replace(/\/$/, "") : "";
+  const key = typeof SUPABASE_KEY === "string" ? SUPABASE_KEY.trim() : "";
+
+  if (!url || !key || url.includes("your-project-id") || key.includes("your-anon-key")) {
+    throw new Error(SUPABASE_CONFIG_ERROR);
+  }
+
+  return { url, key };
+};
+
+const fn = (name: string) => `${getSupabaseConfig().url}/functions/v1/${name}`;
+const getHeaders = () => {
+  const { key } = getSupabaseConfig();
+  return {
+    apikey: key,
+    Authorization: `Bearer ${key}`,
+    "Content-Type": "application/json",
+  };
 };
 
 type Step = "treatment" | "date" | "time" | "details" | "done";
@@ -132,24 +149,38 @@ export default function Book() {
   }, [slots, state.date]);
 
   const fetchTreatmentId = async (slug: string): Promise<string> => {
+    const findCached = () => dbTreatments.find((t) => t.slug === slug)?.id;
+
     if (dbTreatments.length === 0) {
-      try {
-        const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/booking_treatments?select=id,slug&active=eq.true`,
-          { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
-        );
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          const parsed = data.filter(isDbTreatmentRef);
-          setDbTreatments(parsed);
-          return parsed.find((t) => t.slug === slug)?.id ?? slug;
-        }
-      } catch {
-        /* faller tillbaka till slug */
+      const { url, key } = getSupabaseConfig();
+      const res = await fetch(
+        `${url}/rest/v1/booking_treatments?select=id,slug&active=eq.true`,
+        { headers: { apikey: key, Authorization: `Bearer ${key}` } }
+      );
+
+      if (!res.ok) {
+        throw new Error(`Kunde inte läsa behandlingar från databasen (${res.status}).`);
       }
-      return slug;
+
+      const data = await res.json();
+      if (!Array.isArray(data)) {
+        throw new Error("Databasen svarade inte med en giltig behandlingslista.");
+      }
+
+      const parsed = data.filter(isDbTreatmentRef);
+      setDbTreatments(parsed);
+      const match = parsed.find((t) => t.slug === slug)?.id;
+      if (!match) {
+        throw new Error("Den valda behandlingen finns inte aktiv i bokningssystemet.");
+      }
+      return match;
     }
-    return dbTreatments.find((t) => t.slug === slug)?.id ?? slug;
+
+    const cached = findCached();
+    if (!cached) {
+      throw new Error("Den valda behandlingen finns inte aktiv i bokningssystemet.");
+    }
+    return cached;
   };
 
   useEffect(() => {
@@ -158,17 +189,34 @@ export default function Book() {
     const t = treatments.find((x) => x.slug === slug);
     if (!t) return;
     (async () => {
-      const id = await fetchTreatmentId(t.slug);
-      setState((s) => ({ ...s, treatmentSlug: t.slug, treatmentId: id, treatmentName: t.name }));
-      setStep("date");
+      try {
+        const id = await fetchTreatmentId(t.slug);
+        setState((s) => ({ ...s, treatmentSlug: t.slug, treatmentId: id, treatmentName: t.name }));
+        setStep("date");
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Kunde inte förbereda bokningen. Försök igen."
+        );
+      }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const selectTreatment = async (slug: string, name: string) => {
-    const id = await fetchTreatmentId(slug);
-    setState((s) => ({ ...s, treatmentSlug: slug, treatmentId: id, treatmentName: name }));
-    next();
+    setError(null);
+    try {
+      const id = await fetchTreatmentId(slug);
+      setState((s) => ({ ...s, treatmentSlug: slug, treatmentId: id, treatmentName: name }));
+      next();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Kunde inte förbereda bokningen. Försök igen."
+      );
+    }
   };
 
   /**
@@ -186,7 +234,7 @@ export default function Book() {
       const dateStr = toLocalDateStr(date);
       const res = await fetch(
         fn(`get-available-slots?date=${dateStr}&treatment_id=${treatmentId}`),
-        { headers }
+        { headers: getHeaders() }
       );
       if (!res.ok) {
         throw new Error(`Kunde inte h\u00e4mta lediga tider (${res.status})`);
@@ -208,20 +256,28 @@ export default function Book() {
   };
 
   const selectDate = async (date: Date) => {
-    setState((s) => ({ ...s, date, time: "" }));
-    // Tar `treatmentId` från senaste state via uppdatering nedan om det saknas.
-    let treatmentId = state.treatmentId;
-    if (!treatmentId && state.treatmentSlug) {
-      treatmentId = await fetchTreatmentId(state.treatmentSlug);
-      setState((s) => ({ ...s, treatmentId }));
+    try {
+      setState((s) => ({ ...s, date, time: "" }));
+      // Tar `treatmentId` från senaste state via uppdatering nedan om det saknas.
+      let treatmentId = state.treatmentId;
+      if (!treatmentId && state.treatmentSlug) {
+        treatmentId = await fetchTreatmentId(state.treatmentSlug);
+        setState((s) => ({ ...s, treatmentId }));
+      }
+      if (!treatmentId) {
+        setError("V\u00e4lj behandling f\u00f6rst.");
+        return;
+      }
+      const ok = await loadSlotsFor(date, treatmentId);
+      // G\u00e5 bara vidare till tids-steget om hämtningen lyckades.
+      if (ok) next();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Kunde inte hämta lediga tider — försök igen."
+      );
     }
-    if (!treatmentId) {
-      setError("V\u00e4lj behandling f\u00f6rst.");
-      return;
-    }
-    const ok = await loadSlotsFor(date, treatmentId);
-    // G\u00e5 bara vidare till tids-steget om hämtningen lyckades.
-    if (ok) next();
   };
 
   const submit = async () => {
@@ -231,7 +287,7 @@ export default function Book() {
     try {
       const res = await fetch(fn("create-booking"), {
         method: "POST",
-        headers,
+        headers: getHeaders(),
         body: JSON.stringify({
           treatment_id: state.treatmentId,
           booking_date: toLocalDateStr(state.date),
@@ -271,6 +327,10 @@ export default function Book() {
 
         {/* Stepper */}
         <Stepper stepIndex={stepIndex} />
+
+        {error && (
+          <ErrorNotice className="mt-6" message={error} />
+        )}
 
         {/* Layout: huvudinnehåll + sticky summary */}
         <div className="mt-8 md:mt-12 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-12">
@@ -493,16 +553,6 @@ export default function Book() {
                     onChange={(v) => setState((s) => ({ ...s, message: v }))}
                   />
 
-                  {error && (
-                    <div
-                      role="alert"
-                      className="flex items-start gap-3 bg-destructive/8 border border-destructive/30 text-destructive rounded-md p-4"
-                    >
-                      <AlertCircle size={18} className="mt-0.5 shrink-0" />
-                      <p className="text-sm font-medium leading-relaxed">{error}</p>
-                    </div>
-                  )}
-
                   <p className="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed pt-1">
                     <ShieldCheck size={14} className="text-primary mt-0.5 shrink-0" />
                     <span>
@@ -633,6 +683,18 @@ function ActionBar({ onBack }: { onBack: () => void }) {
       <button onClick={onBack} className="btn-secondary">
         <ArrowLeft size={18} /> Tillbaka
       </button>
+    </div>
+  );
+}
+
+function ErrorNotice({ message, className = "" }: { message: string; className?: string }) {
+  return (
+    <div
+      role="alert"
+      className={`flex items-start gap-3 bg-destructive/8 border border-destructive/30 text-destructive rounded-md p-4 ${className}`}
+    >
+      <AlertCircle size={18} className="mt-0.5 shrink-0" />
+      <p className="text-sm font-medium leading-relaxed">{message}</p>
     </div>
   );
 }
