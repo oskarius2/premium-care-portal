@@ -614,7 +614,7 @@ function Stepper({ stepIndex }: { stepIndex: number }) {
                 active ? "text-foreground" : "text-foreground/40"
               }`}
             >
-              {active ? s.label : ""}
+              {active ? s.short : ""}
             </span>
             {!isLast && (
               <span
