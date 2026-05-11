@@ -3,11 +3,11 @@ import { Calendar } from "lucide-react";
 import { siteBrand } from "@/config/siteBrand";
 
 const nav = [
-  { to: "/", label: "Hem", description: "Start och introduktion" },
-  { to: "/behandlingar", label: "Behandlingar", description: "Botox och fillers" },
-  { to: "/priser", label: "Priser", description: "Prislista och konsultation" },
-  { to: "/om", label: "Om oss", description: "Klinik och arbetssätt" },
-  { to: "/kontakt", label: "Kontakt", description: "Adress och uppgifter" },
+  { to: "/", label: "Hem" },
+  { to: "/behandlingar", label: "Behandlingar" },
+  { to: "/priser", label: "Priser" },
+  { to: "/om", label: "Om oss" },
+  { to: "/kontakt", label: "Kontakt" },
 ];
 
 const Header = () => {
@@ -17,8 +17,8 @@ const Header = () => {
     : null;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/70 bg-background/90 shadow-[0_1px_0_rgba(255,255,255,0.78)_inset,0_18px_36px_-32px_rgba(50,63,44,0.45)] backdrop-blur-xl supports-[backdrop-filter]:bg-background/78">
-      <div className="container-wide flex items-center justify-between h-14 sm:h-16 lg:h-24 gap-3">
+    <header className="sticky top-0 z-50 border-b border-border/70 bg-background/92 shadow-[0_1px_0_rgba(255,255,255,0.78)_inset,0_18px_36px_-34px_rgba(50,63,44,0.45)] backdrop-blur-xl supports-[backdrop-filter]:bg-background/82">
+      <div className="container-wide flex items-center justify-between h-14 sm:h-16 lg:h-20 gap-3">
         <Link
           to="/"
           className="group flex items-center leading-none gap-2.5 sm:gap-3 min-w-0 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
@@ -29,7 +29,7 @@ const Header = () => {
             <img
               src={logoSrc}
               alt=""
-              className="hidden lg:block h-11 w-auto max-w-[14rem] object-contain object-left shrink-0 transition-transform duration-200 group-hover:scale-[1.015]"
+              className="hidden lg:block h-10 w-auto max-w-[13rem] object-contain object-left shrink-0 transition-transform duration-200 group-hover:scale-[1.015]"
               width={180}
               height={44}
               decoding="async"
@@ -73,9 +73,9 @@ const Header = () => {
           )}
         </Link>
 
-        {/* Desktop nav — pill-shaped container (from main) */}
+        {/* Desktop nav */}
         <nav
-          className="hidden lg:flex items-center gap-2 rounded-full border border-border/70 bg-white/55 p-1 shadow-[0_1px_0_rgba(255,255,255,0.82)_inset,0_14px_30px_-24px_rgba(50,63,44,0.38)]"
+          className="hidden lg:flex items-center gap-2 rounded-full border border-border/70 bg-white/62 p-1 shadow-[0_1px_0_rgba(255,255,255,0.82)_inset,0_14px_30px_-25px_rgba(50,63,44,0.38)]"
           aria-label="Huvudmeny"
         >
           <div className="flex items-center gap-0.5">
@@ -85,10 +85,10 @@ const Header = () => {
                 to={item.to}
                 end={item.to === "/"}
                 className={({ isActive }) =>
-                  `relative rounded-full px-3.5 xl:px-4 py-2 text-sm font-semibold tracking-[-0.01em] transition-[background-color,border-color,color,box-shadow,transform] duration-200 ${
+                  `relative rounded-full px-3.5 xl:px-4 py-2 text-sm font-semibold tracking-[-0.005em] transition-[background-color,border-color,color,box-shadow,transform] duration-200 ${
                     isActive
-                      ? "bg-accent-soft text-accent-deep shadow-[0_1px_0_rgba(255,255,255,0.8)_inset,0_10px_22px_-18px_rgba(50,63,44,0.52)]"
-                      : "text-foreground/68 hover:-translate-y-0.5 hover:bg-white/70 hover:text-foreground"
+                      ? "bg-primary text-primary-foreground shadow-[0_1px_0_rgba(255,255,255,0.18)_inset,0_10px_22px_-18px_rgba(50,63,44,0.58)]"
+                      : "text-foreground/70 hover:-translate-y-0.5 hover:bg-white/82 hover:text-foreground"
                   }`
                 }
               >

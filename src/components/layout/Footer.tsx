@@ -5,6 +5,13 @@ import { siteBookingNotice, siteBrand } from "@/config/siteBrand";
 import { TelLink, MailLink } from "@/components/ContactAnchors";
 import { Ornament } from "@/components/ui/Ornament";
 
+const footerNav = [
+  { to: "/behandlingar", label: "Behandlingar" },
+  { to: "/priser", label: "Priser" },
+  { to: "/om", label: "Om oss" },
+  { to: "/kontakt", label: "Kontakt" },
+];
+
 const Footer = () => {
   const hasPhone = Boolean(siteContact.phoneDisplay.trim() && siteContact.phoneTel);
   const hasEmail = Boolean(siteContact.emailDisplay.trim() && siteContact.emailAddress);
@@ -15,8 +22,8 @@ const Footer = () => {
   );
 
   return (
-    <footer className="bg-surface border-t border-border/75 mt-24">
-      <div className="container-wide py-14 md:py-20 grid gap-12 md:grid-cols-3">
+    <footer className="bg-surface border-t border-border/75 mt-12 md:mt-16">
+      <div className="container-wide py-12 md:py-14 grid gap-10 md:grid-cols-[1.1fr_0.85fr_1fr]">
         <div className="md:pr-8">
           <p className="font-serif text-[1.65rem] sm:text-4xl leading-tight tracking-tight text-primary mb-1">
             {siteBrand.name}
@@ -27,9 +34,20 @@ const Footer = () => {
           >
             — {siteBrand.tagline} —
           </p>
-          <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
             Medicinsk skönhetsklinik med legitimerade sjuksköterskor. Första bokningen är konsultation i {siteContact.city}; behandling planeras efter 48 timmars betänketid.
           </p>
+          <nav className="flex flex-wrap gap-2 mt-6" aria-label="Sidfot">
+            {footerNav.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="rounded-full border border-border/75 bg-background/70 px-3.5 py-2 text-xs font-semibold text-foreground/72 transition-colors hover:border-primary/30 hover:text-primary"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
         </div>
 
         <div>
@@ -113,7 +131,7 @@ const Footer = () => {
       </div>
 
       <div className="border-t border-border/75">
-        <div className="container-wide py-7 flex flex-col items-center gap-3">
+        <div className="container-wide py-6 flex flex-col items-center gap-3">
           <Ornament className="text-foreground/25" width={84} glyph="diamond" />
           <p className="text-xs text-muted-foreground text-center tracking-wide">
             © {new Date().getFullYear()} {siteBrand.name} · Alla rättigheter förbehållna

@@ -3,7 +3,6 @@ import { Calendar } from "lucide-react";
 import { siteBookingNotice, siteBrand, siteMedicalDisclaimer } from "@/config/siteBrand";
 import { siteContact } from "@/config/siteContact";
 import interior from "@/assets/about/about-clinic.png";
-import consultationNook from "@/assets/clinic/about-consult-nook.png";
 import { Ornament } from "@/components/ui/Ornament";
 
 const expectations = [
@@ -39,7 +38,7 @@ const About = () => {
           </h1>
 
           <p className="lead mt-5 md:mt-7 max-w-2xl">
-            Vi har utvecklats från klassisk frisörsalong till en klinik där injektionsbehandlingar och andra estetiska ingrepp genomförs med samma strukturer som kännetecknar seriös vård: dokumentation, steril teknik, kontinuerlig kompetensutveckling och ett tydligt patientperspektiv.
+            Vi har utvecklats från klassisk salong till en klinik där estetiska injektionsbehandlingar genomförs med samma tydlighet som kännetecknar seriös vård: konsultation, dokumentation, steril teknik och ett starkt patientperspektiv.
           </p>
 
           <p className="mt-5 text-base md:text-[1.0625rem] text-muted-foreground leading-relaxed max-w-2xl">
@@ -78,11 +77,7 @@ const About = () => {
             </p>
 
             <p className="text-muted-foreground text-base md:text-[1.0625rem] leading-relaxed mt-5 max-w-prose">
-              Vårt utbud kretsar kring skinboosters och bioremodellerande protokoll — preparat och tekniker där små skillnader i produktval, djup och punktplacering kan påverka både säkerhet och utfall. Därför lägger vi tid på konsultation, informerat samtycke och uppföljning när så behövs.
-            </p>
-
-            <p className="text-muted-foreground text-base md:text-[1.0625rem] leading-relaxed mt-5 max-w-prose">
-              Vi ser estetik som en del av välbefinnande, men aldrig som ett substitut för dermatologisk eller annan sjukvård när du har symtom eller diagnoser som kräver annan kompetens — då hänvisar vi transparent.
+              Vårt utbud är fokuserat på fillers och botox. Små skillnader i produktval, dosering, djup och punktplacering kan påverka både säkerhet och utfall, därför lägger vi tid på konsultation, informerat samtycke och uppföljning när så behövs.
             </p>
           </div>
         </div>
@@ -124,40 +119,12 @@ const About = () => {
           <p className="text-center text-sm text-muted-foreground mt-10 max-w-2xl mx-auto leading-relaxed">
             {siteBookingNotice} {siteMedicalDisclaimer}
           </p>
-        </div>
-      </section>
 
-      {/* ORD FRÅN VERKSAMHETEN */}
-      <section className="section-y-sm">
-        <div className="container-wide grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-          <div className="lg:col-span-6 order-2 lg:order-1">
-            <span className="eyebrow">Ord från verksamheten</span>
-
-            <Ornament className="text-foreground/30 mt-5 mb-6" width={72} glyph="diamond" />
-
-            <blockquote className="font-serif text-2xl md:text-[1.875rem] leading-snug tracking-tight text-foreground text-balance">
-              <em className="font-serif italic font-normal text-primary/85">«</em>
-              Skönhetsvård som berör hud och vävnad förtjänar samma respekt som annan vård: tid för frågor, mod att avstå när det inte är rätt — och en arbetsmiljö där patienten aldrig känner sig skyldig att{" "}
-              <em className="font-serif italic">köpa mer</em>.
-              <em className="font-serif italic font-normal text-primary/85">»</em>
-            </blockquote>
-
-            <p className="text-[0.7rem] uppercase tracking-[0.18em] text-muted-foreground mt-7">
-              — {siteBrand.name} · {siteContact.city}
-            </p>
-
-            <Link to="/boka" className="btn-primary btn-large mt-9">
+          <div className="mt-8 flex justify-center">
+            <Link to="/boka" className="btn-primary btn-large">
               <Calendar size={20} strokeWidth={1.75} /> Boka konsultation
             </Link>
           </div>
-
-          <img
-            src={consultationNook}
-            alt={`Konsultationsmiljö — ${siteBrand.name}`}
-            className="lg:col-span-6 order-1 lg:order-2 w-full aspect-[4/5] object-cover media-frame"
-            loading="lazy"
-            decoding="async"
-          />
         </div>
       </section>
     </>

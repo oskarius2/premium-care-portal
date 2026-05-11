@@ -7,8 +7,8 @@
 
 @layer base {
   :root {
-    --background: 44 30% 97%;
-    --foreground: 94 10% 24%;
+    --background: 44 34% 97%;
+    --foreground: 96 12% 18%;
 
     --surface: 44 24% 94%;
     --surface-elevated: 0 0% 100%;
@@ -32,20 +32,20 @@
     --secondary: 42 20% 91%;
     --secondary-foreground: 94 10% 24%;
 
-    --muted: 44 20% 93%;
-    --muted-foreground: 94 8% 42%;
+    --muted: 44 24% 92%;
+    --muted-foreground: 96 8% 34%;
 
     --destructive: 0 55% 40%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 44 15% 84%;
-    --input: 44 15% 84%;
+    --border: 44 16% 82%;
+    --input: 44 16% 82%;
     --ring: 96 20% 40%;
 
     --radius: 0.75rem;
 
-    --shadow-card: 0 1px 0 hsl(94 10% 24% / 0.05), 0 1px 14px hsl(94 10% 24% / 0.05);
-    --shadow-lift: 0 1px 0 hsl(94 10% 24% / 0.06), 0 12px 34px hsl(94 10% 24% / 0.09);
+    --shadow-card: 0 1px 0 hsl(96 12% 18% / 0.05), 0 12px 32px hsl(96 12% 18% / 0.055);
+    --shadow-lift: 0 1px 0 hsl(96 12% 18% / 0.06), 0 18px 42px hsl(96 12% 18% / 0.11);
   }
 }
 
@@ -63,8 +63,8 @@
     font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
     font-feature-settings: "kern" 1;
     font-size: 16px;
-    line-height: 1.65;
-    letter-spacing: -0.011em;
+    line-height: 1.68;
+    letter-spacing: -0.006em;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     /* Förhindra horisontell scroll på små skärmar pga av decorativa absolute-element. */
@@ -76,14 +76,14 @@
   }
 
   @media (min-width: 768px) {
-    body { font-size: 17px; letter-spacing: -0.013em; }
+    body { font-size: 17px; letter-spacing: -0.008em; }
   }
 
   h1, h2, h3, h4 {
     @apply text-foreground;
     font-weight: 500;
-    letter-spacing: -0.02em;
-    line-height: 1.18;
+    letter-spacing: -0.022em;
+    line-height: 1.12;
   }
 
   *:focus-visible {
@@ -112,11 +112,11 @@
   }
 
   .section-y {
-    @apply py-14 sm:py-20 md:py-28 lg:py-40;
+    @apply py-12 sm:py-16 md:py-20 lg:py-24;
   }
 
   .section-y-sm {
-    @apply py-12 sm:py-16 md:py-24 lg:py-28;
+    @apply py-10 sm:py-14 md:py-16 lg:py-20;
   }
 
   .hairline {
@@ -125,7 +125,7 @@
 
   /** Upphöjd yta — samma DNA som kort, bokningspaneler m.m. */
   .panel {
-    @apply bg-card rounded-2xl border border-border/90 shadow-[var(--shadow-card)];
+    @apply bg-card rounded-[1.5rem] border border-border/85 shadow-[var(--shadow-card)];
   }
 
   /** Ikonring — salvia/beige, alltid samma proportioner */
@@ -143,27 +143,27 @@
 
   /** Bildram — samma som HeroMedia / klinikbilder */
   .media-frame {
-    @apply rounded-2xl border border-border/75 shadow-[var(--shadow-card)];
+    @apply rounded-[1.5rem] border border-border/75 shadow-[var(--shadow-card)];
   }
 
   .media-frame-lift {
-    @apply rounded-2xl border border-border/75 shadow-[var(--shadow-lift)];
+    @apply rounded-[1.5rem] border border-border/75 shadow-[var(--shadow-lift)];
   }
 
   /** Rutnät med tunna linjer — samma divider-ton överallt */
   .grid-divided {
-    @apply gap-px bg-border/45 border border-border/65 rounded-2xl overflow-hidden;
+    @apply gap-px bg-border/45 border border-border/65 rounded-[1.5rem] overflow-hidden;
   }
 
-  /* Knappar — statement: mer identitet, mer djup, tydlig premium-signatur */
+  /* Knappar — tydliga, mjuka och konsekventa genom hela sidan */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-2xl
-           bg-[linear-gradient(135deg,hsl(96_24%_40%)_0%,hsl(96_18%_33%)_48%,hsl(97_18%_26%)_100%)]
-           text-primary-foreground font-semibold text-[0.97rem] tracking-[0.035em]
-           border border-[hsl(97_20%_24%/0.62)]
-           shadow-[0_1px_0_rgba(255,255,255,0.15)_inset,0_18px_36px_-20px_rgba(50,63,44,0.62),0_10px_24px_-18px_rgba(50,63,44,0.7)]
-           hover:shadow-[0_1px_0_rgba(255,255,255,0.24)_inset,0_24px_44px_-20px_rgba(50,63,44,0.72),0_14px_32px_-20px_rgba(50,63,44,0.82)]
-           hover:-translate-y-1 hover:brightness-110
+    @apply inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full
+           bg-[linear-gradient(135deg,hsl(96_21%_39%)_0%,hsl(96_18%_32%)_55%,hsl(97_18%_26%)_100%)]
+           text-primary-foreground font-semibold text-[0.95rem] tracking-[0.02em]
+           border border-[hsl(97_20%_24%/0.58)]
+           shadow-[0_1px_0_rgba(255,255,255,0.18)_inset,0_16px_30px_-20px_rgba(50,63,44,0.65)]
+           hover:shadow-[0_1px_0_rgba(255,255,255,0.25)_inset,0_20px_36px_-19px_rgba(50,63,44,0.74)]
+           hover:-translate-y-0.5 hover:brightness-105
            active:translate-y-0 active:brightness-100 active:opacity-[0.95]
            disabled:pointer-events-none disabled:opacity-50
            transition-[box-shadow,opacity,transform,filter] duration-200 ease-out
@@ -172,13 +172,13 @@
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-2xl
+    @apply inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full
            bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(255,255,255,0.92))]
-           text-foreground font-semibold text-[0.97rem] tracking-[0.03em]
-           border border-[hsl(var(--foreground)/0.18)]
-           shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_12px_26px_-22px_rgba(50,63,44,0.45)]
-           hover:border-[hsl(var(--foreground)/0.34)] hover:bg-[linear-gradient(180deg,rgba(255,255,255,1),rgba(245,244,238,0.98))]
-           hover:-translate-y-0.5 hover:shadow-[0_16px_30px_-20px_rgba(50,63,44,0.55)]
+           text-foreground font-semibold text-[0.95rem] tracking-[0.015em]
+           border border-[hsl(var(--foreground)/0.16)]
+           shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_12px_26px_-24px_rgba(50,63,44,0.45)]
+           hover:border-[hsl(var(--foreground)/0.30)] hover:bg-[linear-gradient(180deg,rgba(255,255,255,1),rgba(245,244,238,0.98))]
+           hover:-translate-y-0.5 hover:shadow-[0_16px_30px_-22px_rgba(50,63,44,0.52)]
            active:translate-y-0 active:opacity-[0.95]
            disabled:pointer-events-none disabled:opacity-50
            transition-[background-color,border-color,box-shadow,color,opacity,transform] duration-200 ease-out
@@ -187,22 +187,22 @@
   }
 
   .btn-large {
-    @apply text-[0.98rem] md:text-[1.08rem] px-9 md:px-11 py-4 md:py-[1.1rem] min-h-[56px] md:min-h-[60px];
+    @apply text-[0.98rem] md:text-[1.02rem] px-8 md:px-10 py-4 min-h-[54px] md:min-h-[56px];
   }
 
   /** Header / verktygsrad — något tätare än standard */
   .btn-compact {
-    @apply text-[0.78rem] sm:text-[0.8125rem] md:text-sm px-4 sm:px-6 py-2.5 min-h-[44px] md:min-h-[46px] md:px-7 md:py-2.5 tracking-[0.03em] rounded-2xl;
+    @apply text-[0.78rem] sm:text-[0.8125rem] md:text-sm px-4 sm:px-5 py-2.5 min-h-[44px] md:min-h-[46px] md:px-6 md:py-2.5 tracking-[0.02em] rounded-full;
   }
 
   /** Två knappar bredvid varandra i kort (behandlingslista) */
   .btn-card-pair {
-    @apply flex-1 min-w-0 justify-center text-[0.93rem] sm:text-[0.97rem] px-4 sm:px-5 py-3.5 min-h-[52px] sm:min-h-[54px] tracking-[0.03em] rounded-2xl;
+    @apply flex-1 min-w-0 justify-center text-[0.93rem] sm:text-[0.95rem] px-4 sm:px-5 py-3.5 min-h-[52px] sm:min-h-[54px] tracking-[0.015em] rounded-full;
   }
 
   /** Primär sektion med mörk bakgrund — ljus fylld CTA */
   .btn-solid-light {
-    @apply inline-flex items-center justify-center gap-2.5 rounded-2xl font-semibold tracking-[0.03em]
+    @apply inline-flex items-center justify-center gap-2.5 rounded-full font-semibold tracking-[0.015em]
            bg-[linear-gradient(135deg,rgba(255,255,255,1),rgba(245,244,238,0.98))]
            text-primary border border-white/70
            shadow-[0_1px_0_rgba(255,255,255,0.95)_inset,0_18px_34px_-20px_rgba(0,0,0,0.58)]
@@ -210,13 +210,13 @@
            hover:shadow-[0_24px_46px_-22px_rgba(0,0,0,0.66)] hover:-translate-y-1
            active:opacity-[0.93]
            transition-[background-color,box-shadow,opacity,transform,filter,border-color] duration-200 ease-out
-           text-[0.98rem] md:text-[1.08rem] px-9 md:px-11 py-4 md:py-[1.1rem] min-h-[56px] md:min-h-[60px]
+           text-[0.98rem] md:text-[1.02rem] px-8 md:px-10 py-4 min-h-[54px] md:min-h-[56px]
            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary;
   }
 
   /** Primär sektion — kontur mot ljus text */
   .btn-outline-light {
-    @apply inline-flex items-center justify-center gap-2.5 rounded-2xl font-semibold tracking-[0.03em]
+    @apply inline-flex items-center justify-center gap-2.5 rounded-full font-semibold tracking-[0.015em]
            bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.01))]
            text-primary-foreground border border-white/55
            shadow-[0_1px_0_rgba(255,255,255,0.22)_inset,0_10px_24px_-18px_rgba(0,0,0,0.6)]
@@ -224,7 +224,7 @@
            hover:shadow-[0_16px_34px_-16px_rgba(0,0,0,0.58)]
            active:opacity-[0.93]
            transition-[background-color,border-color,box-shadow,opacity,transform] duration-200 ease-out
-           text-[0.98rem] md:text-[1.08rem] px-9 md:px-11 py-4 md:py-[1.1rem] min-h-[56px] md:min-h-[60px]
+           text-[0.98rem] md:text-[1.02rem] px-8 md:px-10 py-4 min-h-[54px] md:min-h-[56px]
            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/55 focus-visible:ring-offset-2 focus-visible:ring-offset-primary;
   }
 
@@ -251,19 +251,19 @@
   }
 
   .card-soft {
-    @apply bg-card rounded-2xl border border-border/90 shadow-[var(--shadow-card)] p-5 md:p-8;
+    @apply bg-card rounded-[1.5rem] border border-border/90 shadow-[var(--shadow-card)] p-5 md:p-8;
   }
 
   .section {
-    @apply py-12 md:py-24;
+    @apply py-10 md:py-16;
   }
 
   .heading-xl {
-    @apply font-serif text-[2.05rem] xs:text-[2.35rem] sm:text-5xl md:text-6xl lg:text-7xl font-medium leading-[1.1] sm:leading-[1.05] tracking-tight;
+    @apply font-serif text-[2.15rem] xs:text-[2.45rem] sm:text-5xl md:text-6xl lg:text-[4.5rem] font-medium leading-[1.06] tracking-tight;
   }
 
   .heading-lg {
-    @apply font-serif text-[1.7rem] xs:text-[1.9rem] sm:text-4xl md:text-5xl font-medium leading-[1.18] sm:leading-[1.12] md:leading-[1.15] tracking-tight;
+    @apply font-serif text-[1.8rem] xs:text-[2rem] sm:text-4xl md:text-5xl font-medium leading-[1.12] tracking-tight;
   }
 
   .heading-md {
@@ -271,11 +271,11 @@
   }
 
   .lead {
-    @apply text-[0.975rem] sm:text-lg md:text-[1.125rem] text-muted-foreground leading-relaxed font-normal;
+    @apply text-[1rem] sm:text-lg md:text-[1.125rem] text-muted-foreground leading-relaxed font-normal;
   }
 
   .eyebrow {
-    @apply inline-block text-[0.6875rem] font-medium uppercase tracking-[0.16em] text-muted-foreground;
+    @apply inline-block text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground;
   }
 }
 

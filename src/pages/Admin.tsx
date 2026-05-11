@@ -248,7 +248,7 @@ export default function Admin() {
   // ── RENDER GUARDS ──────────────────────────────────────
   if (authChecking) {
     return (
-      <section className="pt-40 pb-32 container-narrow text-center">
+      <section className="section-y-sm container-narrow text-center">
         <p className="text-sm text-muted-foreground font-light">Verifierar...</p>
       </section>
     );
@@ -256,9 +256,9 @@ export default function Admin() {
 
   if (!isAdmin) {
     return (
-      <section className="pt-28 md:pt-40 pb-32 container-narrow max-w-md">
+      <section className="section-y-sm container-narrow max-w-md">
         <p className="eyebrow mb-5">Admin</p>
-        <h1 className="heading-section heading-h2 mb-6">Ingen <span className="italic text-primary">behörighet.</span></h1>
+        <h1 className="heading-lg mb-6">Ingen <span className="italic text-primary">behörighet.</span></h1>
         <p className="text-sm text-muted-foreground font-light mb-8">
           Kontot <span className="text-foreground">{userEmail}</span> har inte adminroll.
           Be en befintlig admin tilldela rollen i databasen.

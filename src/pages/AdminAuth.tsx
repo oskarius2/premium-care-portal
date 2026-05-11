@@ -58,9 +58,9 @@ export default function AdminAuth() {
   if (checking) return null;
 
   return (
-    <section className="pt-28 md:pt-40 pb-32 container-narrow max-w-sm">
+    <section className="section-y-sm container-narrow max-w-sm">
       <p className="eyebrow mb-5">Admin</p>
-      <h1 className="heading-section heading-h2 mb-10">
+      <h1 className="heading-lg mb-8">
         {mode === "login" ? <>Logga <span className="italic text-primary">in.</span></> : <>Nytt <span className="italic text-primary">konto.</span></>}
       </h1>
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -71,7 +71,7 @@ export default function AdminAuth() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full border border-border bg-surface px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
+            className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
             placeholder="du@klinik.se"
           />
         </div>
@@ -83,14 +83,14 @@ export default function AdminAuth() {
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={8}
-            className="w-full border border-border bg-surface px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
+            className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
             placeholder="••••••••"
           />
         </div>
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-primary text-primary-foreground py-3 text-xs uppercase tracking-[0.24em] hover:bg-accent-deep transition-colors disabled:opacity-50"
+          className="btn-primary w-full"
         >
           {loading ? "..." : mode === "login" ? "Logga in" : "Skapa konto"}
         </button>

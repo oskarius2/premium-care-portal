@@ -8,16 +8,14 @@ import {
   ShieldCheck,
   Sparkles,
   ArrowUpRight,
-  Check,
-  ScanLine,
+  Tag,
 } from "lucide-react";
 import heroImg from "@/assets/clinic/hero-clinic.png";
-import { siteBookingNotice, siteBrand, siteMedicalDisclaimer } from "@/config/siteBrand";
+import { siteBookingNotice, siteBrand } from "@/config/siteBrand";
 import { siteContact } from "@/config/siteContact";
 import { HeroMedia } from "@/components/HeroMedia";
 import { Ornament } from "@/components/ui/Ornament";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { treatments } from "@/data/treatments";
 
 const heroTrust = [
   { icon: Stethoscope, label: "Legitimerad personal" },
@@ -25,77 +23,43 @@ const heroTrust = [
   { icon: ShieldCheck, label: "Journalförd vård" },
 ];
 
-const signaturePillars = [
+const quickLinks = [
+  {
+    icon: Sparkles,
+    title: "Behandlingar",
+    body: "Se fillers och botox, hur konsultationen fungerar och vad som ingår.",
+    to: "/behandlingar",
+    cta: "Se behandlingar",
+  },
+  {
+    icon: Tag,
+    title: "Priser",
+    body: "Hitta prislogiken och vad som avgör kostnaden efter bedömning.",
+    to: "/priser",
+    cta: "Se priser",
+  },
   {
     icon: Stethoscope,
-    title: "Medicinsk kompetens",
-    body: "Bedömning, behandling och uppföljning hålls samman i samma kliniska flöde — utan att det känns kallt eller opersonligt.",
+    title: "Om kliniken",
+    body: "Läs om arbetssättet, den medicinska ramen och miljön i kliniken.",
+    to: "/om",
+    cta: "Läs om oss",
   },
   {
-    icon: ScanLine,
-    title: "Naturlig strategi",
-    body: "Fokus ligger på hudkvalitet, struktur och harmoni över tid, inte på snabba eller överdrivna förändringar.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Trygg process",
-    body: "Indikationer, risker, eftervård och förväntningar förklaras tydligt innan något görs — aldrig efteråt.",
-  },
-];
-
-const processSteps = [
-  {
-    n: "01",
-    title: "Boka konsultation",
-    body: "Boka online eller hör av dig direkt. Det första besöket är konsultation och viktig information, inte en behandlingstid.",
-  },
-  {
-    n: "02",
-    title: "Konsultation",
-    body: "Vi går igenom mål, hudstatus, historik, risker och vad som faktiskt är rimligt att uppnå med aktuell behandling.",
-  },
-  {
-    n: "03",
-    title: "48 h betänketid",
-    body: "Efter konsultation gäller 48 timmars betänketid innan estetisk injektionsbehandling kan utföras eller bokas in.",
-  },
-  {
-    n: "04",
-    title: "Behandling & eftervård",
-    body: "Om du vill gå vidare planeras behandlingen efter betänketiden, med aseptisk teknik, dokumentation och tydlig eftervård.",
-  },
-];
-
-const faqs = [
-  {
-    q: "Hur vet jag vilken behandling som passar mig?",
-    a: "Det avgörs i konsultationen. Behandlingen väljs utifrån hud, anatomi, mål och historik — inte utifrån vilken produkt som låter mest exklusiv.",
-  },
-  {
-    q: "Kommer resultatet att se naturligt ut?",
-    a: "Det är ambitionen. Kliniken är utformad kring gradvisa förbättringar i hudkvalitet, balans och uttryck snarare än snabba, hårda förändringar.",
-  },
-  {
-    q: "Vad händer om jag bokar fel behandling?",
-    a: "Då justeras planen. Rätt behandling väljs först efter medicinsk bedömning, så bokningen online fungerar som konsultation och första steg — inte ett låst beslut.",
-  },
-  {
-    q: "Varför bokar jag konsultation först?",
-    a: "För estetiska injektionsbehandlingar behöver du få individuell information och därefter 48 timmars betänketid innan behandling kan utföras. Första bokningstillfället är därför endast konsultation.",
-  },
-  {
-    q: "Varför är tonen så medicinsk?",
-    a: "För att injektionsbehandling är vårdnära. Den kan vara varm, estetisk och välkomnande — men den ska fortfarande kännas seriös, tydlig och trygg.",
+    icon: MapPin,
+    title: "Kontakt",
+    body: "Adress, öppettider och kontaktvägar samlade på en tydlig sida.",
+    to: "/kontakt",
+    cta: "Hitta hit",
   },
 ];
 
 const Index = () => {
   const hasOpeningHours = Boolean(siteContact.openingHoursHeroLine.trim());
-  const featuredServices = treatments;
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-border/75 min-h-[min(72vh,42rem)]">
+      <section className="relative overflow-hidden border-b border-border/75 min-h-[calc(100svh-3.5rem)] lg:min-h-[calc(100svh-5rem)] flex items-center">
         <div className="absolute inset-0 z-0">
           <HeroMedia variant="background" posterSrc={heroImg} alt="" />
         </div>
@@ -110,7 +74,7 @@ const Index = () => {
           aria-hidden
         />
 
-        <div className="container-wide relative z-10 pt-6 sm:pt-10 md:pt-14 lg:pt-16 pb-10 sm:pb-12 md:pb-16 lg:pb-20">
+        <div className="container-wide relative z-10 py-8 sm:py-10 md:py-12 lg:py-14">
           <div className="fade-up max-w-[40rem]">
             <div className="rounded-[1.75rem] border border-border/60 bg-background/88 backdrop-blur-md px-5 py-6 sm:px-7 sm:py-8 shadow-[var(--shadow-card)]">
               <ul className="hidden md:flex items-center gap-5 mb-8 flex-wrap">
@@ -200,181 +164,59 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="bg-background border-b border-border/75">
-        <div className="container-wide py-10 sm:py-12 md:py-14">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px grid-divided">
-            {signaturePillars.map(({ icon: Icon, title, body }) => (
-              <div key={title} className="bg-background p-6 sm:p-7 md:p-8 lg:p-9 flex flex-col gap-4 sm:gap-5">
-                <span className="icon-circle-md">
+      <section className="section-y-sm">
+        <div className="container-wide">
+          <SectionHeader
+            eyebrow="Navigera vidare"
+            title="Hitta rätt sida."
+            accent="Snabbt och tydligt."
+            lead="Startsidan är medvetet kort. Välj den sida som passar nästa steg, så slipper du leta i ett långt flöde."
+            align="center"
+            className="mb-8 sm:mb-10 md:mb-12 mx-auto"
+          />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-6xl mx-auto">
+            {quickLinks.map(({ icon: Icon, title, body, to, cta }) => (
+              <Link
+                key={to}
+                to={to}
+                className="group bg-card rounded-[1.5rem] border border-border/80 shadow-[var(--shadow-card)] p-5 sm:p-6 min-h-[15rem] flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)] hover:border-primary/30"
+              >
+                <span className="icon-circle-md mb-5">
                   <Icon size={22} strokeWidth={1.75} />
                 </span>
-                <div>
-                  <h2 className="font-serif text-[1.4rem] sm:text-2xl md:text-[1.75rem] leading-tight tracking-tight text-foreground mb-2.5 sm:mb-3">
-                    {title}
-                  </h2>
-                  <p className="text-muted-foreground text-[0.92rem] sm:text-[0.96rem] leading-relaxed">
-                    {body}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="section-y-sm">
-        <div className="container-wide">
-          <SectionHeader
-            eyebrow="Våra behandlingar"
-            title="Två behandlingar."
-            accent="En medicinsk standard."
-            lead="Vi har medvetet hållit utbudet smalt — fillers med Revolax Fine och botox med Dysport — för att kunna hålla riktigt hög nivå på konsultation, bedömning, 48 timmars betänketid och utförande i varje behandling."
-            align="center"
-            className="mb-10 sm:mb-12 md:mb-16 mx-auto"
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 md:gap-7 max-w-5xl mx-auto">
-            {featuredServices.map((t) => (
-              <article
-                key={t.slug}
-                className="group bg-card rounded-[1.5rem] sm:rounded-[1.75rem] border border-border/75 shadow-[var(--shadow-card)] overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]"
-              >
-                <div className="overflow-hidden border-b border-border/70">
-                  <img
-                    src={t.image}
-                    alt={t.name}
-                    className="w-full aspect-[16/10] sm:aspect-[4/3] object-cover transition-transform duration-500 group-hover:scale-[1.035]"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </div>
-                <div className="p-5 sm:p-6 md:p-7 flex flex-col flex-1">
-                  <div className="flex items-center justify-between gap-3 mb-3 sm:mb-4">
-                    <span className="eyebrow">{t.category}</span>
-                    <span className="text-[0.66rem] sm:text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
-                      {t.duration}
-                    </span>
-                  </div>
-
-                  <h3 className="font-serif text-[1.55rem] sm:text-[1.75rem] md:text-[1.9rem] leading-tight tracking-tight text-foreground text-balance">
-                    {t.name}
-                  </h3>
-                  <p className="font-serif italic text-[1rem] sm:text-lg text-primary/80 leading-snug mt-2 text-balance">
-                    {t.tagline}
-                  </p>
-                  <p className="text-muted-foreground text-[0.92rem] sm:text-[0.95rem] leading-relaxed mt-4 sm:mt-5 flex-1">
-                    {t.short}
-                  </p>
-
-                  <ul className="mt-5 sm:mt-6 space-y-2.5">
-                    {t.includes.slice(0, 2).map((item) => (
-                      <li
-                        key={item}
-                        className="flex items-start gap-3 text-[0.88rem] sm:text-sm text-foreground/85 leading-relaxed"
-                      >
-                        <Check size={15} strokeWidth={2} className="text-primary mt-0.5 shrink-0" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="mt-6 sm:mt-7 flex flex-col sm:flex-row gap-2.5 sm:gap-3">
-                    <Link to={`/behandlingar/${t.slug}`} className="btn-secondary btn-card-pair">
-                      Läs mer <ArrowUpRight size={16} strokeWidth={1.75} />
-                    </Link>
-                    <Link to={`/boka?treatment=${encodeURIComponent(t.slug)}`} className="btn-primary btn-card-pair">
-                      Boka konsultation
-                    </Link>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="section-y-sm bg-surface border-y border-border/75">
-        <div className="container-wide">
-          <SectionHeader
-            eyebrow="Så går det till"
-            title="Från första kontakt"
-            accent="till uppföljning"
-            lead="Varje besök följer samma struktur — så att du vet vad som händer, varför det görs och vad du kan förvänta dig efteråt."
-            align="center"
-            className="mb-10 sm:mb-14 md:mb-20 mx-auto"
-          />
-
-          <ol className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
-            {processSteps.map((step) => (
-              <li
-                key={step.n}
-                className="panel p-6 sm:p-7 md:p-8 lg:p-9 flex flex-col min-h-full"
-              >
-                <div className="flex items-baseline gap-3 sm:gap-4 mb-4 sm:mb-6">
-                  <span className="font-serif italic text-[2.1rem] sm:text-[2.5rem] lg:text-[3rem] leading-none text-primary/80 select-none">
-                    {step.n}
-                  </span>
-                  <span className="hairline flex-1" />
-                </div>
-                <h3 className="font-serif text-[1.4rem] sm:text-2xl leading-snug tracking-tight text-foreground mb-2 sm:mb-3">
-                  {step.title}
-                </h3>
-                <p className="text-muted-foreground text-[0.92rem] sm:text-[0.95rem] leading-relaxed">
-                  {step.body}
+                <h2 className="font-serif text-[1.55rem] sm:text-[1.75rem] leading-tight tracking-tight text-foreground text-balance">
+                  {title}
+                </h2>
+                <p className="text-[0.94rem] text-muted-foreground leading-relaxed mt-3 flex-1">
+                  {body}
                 </p>
-              </li>
+                <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary">
+                  {cta}
+                  <ArrowUpRight size={16} strokeWidth={1.75} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </span>
+              </Link>
             ))}
-          </ol>
-        </div>
-      </section>
-
-      <section className="section-y-sm">
-        <div className="container-wide">
-          <SectionHeader
-            eyebrow="Vanliga frågor"
-            title="Det du brukar"
-            accent="undra över först"
-            lead="Korta, raka svar på det de flesta tänker innan de bokar. Resten går vi igenom tillsammans i konsultationen."
-            align="center"
-            className="mb-10 sm:mb-14 md:mb-20 mx-auto"
-          />
-
-          <div className="max-w-3xl mx-auto">
-            <dl className="border-t border-border/75">
-              {faqs.map((f) => (
-                <div key={f.q} className="border-b border-border/75 py-4 sm:py-5 md:py-6">
-                  <dt className="font-serif text-[1.05rem] sm:text-[1.125rem] md:italic md:text-[1.375rem] text-foreground leading-snug mb-2 sm:mb-2.5 md:mb-3 text-balance">
-                    {f.q}
-                  </dt>
-                  <dd className="text-muted-foreground text-[0.92rem] sm:text-[0.95rem] md:text-base leading-relaxed">
-                    {f.a}
-                  </dd>
-                </div>
-              ))}
-            </dl>
           </div>
         </div>
       </section>
 
       <section className="bg-primary text-primary-foreground">
-        <div className="container-narrow text-center py-16 sm:py-20 md:py-28 lg:py-32 flex flex-col items-center">
-          <Ornament className="text-primary-foreground/40 mb-5 sm:mb-6" width={64} glyph="diamond" />
-
-          <span className="text-[0.66rem] sm:text-[0.7rem] uppercase tracking-[0.22em] text-primary-foreground/70 mb-4 sm:mb-5">
+        <div className="container-narrow text-center py-12 sm:py-14 md:py-16 flex flex-col items-center">
+          <span className="text-[0.66rem] sm:text-[0.7rem] uppercase tracking-[0.22em] text-primary-foreground/70 mb-4">
             Boka konsultation
           </span>
 
-          <h2 className="font-serif text-[2rem] xs:text-[2.25rem] sm:text-4xl md:text-5xl lg:text-6xl font-medium leading-[1.12] sm:leading-[1.1] tracking-tight text-balance max-w-[18ch] sm:max-w-[20ch]">
-            Ett första samtal —
-            <em className="font-serif italic font-normal text-primary-foreground/90"> utan förbehåll.</em>
+          <h2 className="font-serif text-[2rem] xs:text-[2.25rem] sm:text-4xl md:text-5xl font-medium leading-[1.1] tracking-tight text-balance max-w-[20ch]">
+            Ett första samtal
+            <em className="font-serif italic font-normal text-primary-foreground/90"> med tydlig struktur.</em>
           </h2>
 
-          <p className="text-primary-foreground/80 text-[0.95rem] sm:text-base md:text-lg leading-relaxed mt-5 sm:mt-6 max-w-xl">
-            Konsultationen är till för att lyssna, undersöka och föreslå. Efteråt har du
-            48 timmars betänketid innan eventuell behandling kan planeras.
+          <p className="text-primary-foreground/80 text-[0.95rem] sm:text-base leading-relaxed mt-5 max-w-xl">
+            {siteBookingNotice}
           </p>
 
-          <div className="mt-7 sm:mt-9 flex flex-col sm:flex-row gap-3 w-full max-w-md sm:max-w-none sm:w-auto">
+          <div className="mt-7 flex flex-col sm:flex-row gap-3 w-full max-w-md sm:max-w-none sm:w-auto">
             <Link to="/behandlingar" className="btn-solid-light w-full sm:w-auto">
               Se behandlingar
             </Link>
@@ -383,9 +225,6 @@ const Index = () => {
             </Link>
           </div>
 
-          <p className="text-[0.72rem] sm:text-[0.75rem] text-primary-foreground/60 mt-10 sm:mt-12 max-w-xl leading-relaxed">
-            {siteBookingNotice} {siteMedicalDisclaimer}
-          </p>
         </div>
       </section>
     </>

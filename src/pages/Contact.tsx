@@ -31,7 +31,7 @@ const Contact = () => {
           </h1>
 
           <p className="lead mt-4 sm:mt-5 md:mt-7 max-w-2xl">
-            Kontaktsidan är tillfälligt förenklad tills alla uppgifter är färdiga för publicering. Adressen är inlagd nu, och övriga kontaktvägar kan fyllas på senare utan att sidan behöver byggas om.
+            Adress, öppettider och kontaktvägar är samlade här så att nästa steg är enkelt — boka online eller hör av dig när du behöver hjälp att hitta rätt.
           </p>
 
           <p className="text-xs text-muted-foreground max-w-2xl leading-relaxed border-t border-border/75 pt-6 sm:pt-7 mt-7 sm:mt-9">
@@ -160,10 +160,10 @@ const Contact = () => {
         </div>
       </section>
 
-      <section className="bg-surface border-y border-border/75 py-10 sm:py-12 md:py-16">
+      <section className="bg-surface border-y border-border/75 py-8 sm:py-10 md:py-12">
         <div className="container-wide">
           {siteContact.mapEmbedUrl ? (
-            <div className="media-frame overflow-hidden aspect-[4/3] sm:aspect-[16/9]">
+            <div className="media-frame overflow-hidden aspect-[4/3] sm:aspect-[16/8]">
               <iframe
                 title={`Karta till ${siteBrand.name}`}
                 src={siteContact.mapEmbedUrl}
@@ -172,17 +172,13 @@ const Contact = () => {
               />
             </div>
           ) : (
-            <div className="rounded-xl border border-dashed border-foreground/15 bg-background/80 aspect-[4/3] sm:aspect-[16/9] flex flex-col items-center justify-center px-5 sm:px-6 text-center">
+            <div className="rounded-[1.5rem] border border-dashed border-foreground/15 bg-background/80 aspect-[4/3] sm:aspect-[16/8] flex flex-col items-center justify-center px-5 sm:px-6 text-center">
               <MapPin className="text-primary/60 mb-3 sm:mb-4" size={28} strokeWidth={1.5} />
               <p className="font-serif text-[1.05rem] sm:text-lg md:text-xl leading-tight text-foreground mb-2">
                 Karta kommer snart
               </p>
               <p className="text-[0.92rem] sm:text-[0.9375rem] text-muted-foreground max-w-md leading-relaxed">
-                När kartlänk finns på plats kan den läggas in direkt i{" "}
-                <code className="text-[0.78rem] sm:text-[0.8125rem] bg-muted px-2 py-0.5 rounded">
-                  siteContact.mapEmbedUrl
-                </code>
-                .
+                Adressen visas ovan. Karta läggs till när klinikens kartlänk är klar.
               </p>
             </div>
           )}
