@@ -78,44 +78,44 @@ const Index = () => {
           <div className="fade-up max-w-[40rem]">
             <div className="rounded-[1.75rem] border border-border/60 bg-background/88 backdrop-blur-md px-5 py-6 sm:px-7 sm:py-8 shadow-[var(--shadow-card)]">
               <ul className="hidden md:flex items-center gap-5 mb-8 flex-wrap">
-              {heroTrust.map(({ icon: Icon, label }, i) => (
-                <li key={label} className="inline-flex items-center gap-5">
-                  {i > 0 && <span className="w-px h-3 bg-border/80" aria-hidden="true" />}
-                  <span className="inline-flex items-center gap-2 text-[0.72rem] uppercase tracking-[0.16em] text-foreground/72">
-                    <span className="icon-circle-sm scale-[0.85]">
-                      <Icon size={14} strokeWidth={1.75} />
+                {heroTrust.map(({ icon: Icon, label }, i) => (
+                  <li key={label} className="inline-flex items-center gap-5">
+                    {i > 0 && <span className="w-px h-3 bg-border/80" aria-hidden="true" />}
+                    <span className="inline-flex items-center gap-2 text-[0.72rem] uppercase tracking-[0.16em] text-foreground/72">
+                      <span className="icon-circle-sm scale-[0.85]">
+                        <Icon size={14} strokeWidth={1.75} />
+                      </span>
+                      {label}
                     </span>
-                    {label}
-                  </span>
-                </li>
-              ))}
-            </ul>
+                  </li>
+                ))}
+              </ul>
 
-            <span className="eyebrow text-foreground/80">{siteBrand.tagline} · {siteContact.city}</span>
-            <Ornament className="text-foreground/35 mt-4 mb-5 sm:mt-5 sm:mb-6 md:mt-6 md:mb-7" width={72} glyph="diamond" />
+              <span className="eyebrow text-foreground/80">{siteBrand.tagline} · {siteContact.city}</span>
+              <Ornament className="text-foreground/35 mt-4 mb-5 sm:mt-5 sm:mb-6 md:mt-6 md:mb-7" width={72} glyph="diamond" />
 
-            <h1 className="heading-xl text-balance max-w-[14ch] sm:max-w-[11ch] [text-shadow:0_1px_0_hsl(var(--background)_/_0.95),0_0_1px_hsl(var(--background)_/_0.9),0_2px_24px_hsl(var(--background)_/_0.65)]">
+              <h1 className="heading-xl text-balance max-w-[14ch] sm:max-w-[11ch] [text-shadow:0_1px_0_hsl(var(--background)_/_0.95),0_0_1px_hsl(var(--background)_/_0.9),0_2px_24px_hsl(var(--background)_/_0.65)]">
               Premium känsla.
               <br />
               <em className="font-serif italic font-normal text-primary">
                 Medicinsk ryggrad.
               </em>
-            </h1>
+              </h1>
 
-            <p className="lead mt-4 sm:mt-5 md:mt-7 max-w-xl text-foreground/95 [text-shadow:0_1px_0_hsl(var(--background)_/_0.9),0_0_20px_hsl(var(--background)_/_0.55)]">
+              <p className="lead mt-4 sm:mt-5 md:mt-7 max-w-xl text-foreground/95 [text-shadow:0_1px_0_hsl(var(--background)_/_0.9),0_0_20px_hsl(var(--background)_/_0.55)]">
               {siteBrand.name} är byggd för dig som vill möta estetisk behandling i en miljö som känns lugn, pålitlig och professionell — med fokus på hudkvalitet, tydlighet och naturliga resultat över tid.
-            </p>
+              </p>
 
-            <div className="mt-6 sm:mt-7 md:mt-10 flex flex-col sm:flex-row gap-3 sm:gap-3 md:gap-4">
+              <div className="mt-6 sm:mt-7 md:mt-10 flex flex-col sm:flex-row gap-3 sm:gap-3 md:gap-4">
               <Link to="/boka" className="btn-primary btn-large justify-center w-full sm:w-auto">
                 <Calendar size={20} strokeWidth={1.75} /> Boka konsultation
               </Link>
               <Link to="/behandlingar" className="btn-secondary btn-large justify-center w-full sm:w-auto">
                 <Sparkles size={20} strokeWidth={1.75} /> Se behandlingar
               </Link>
-            </div>
+              </div>
 
-            <ul className="md:hidden mt-6 grid grid-cols-3 gap-px bg-border/45 border border-border/65 rounded-xl overflow-hidden">
+              <ul className="md:hidden mt-6 grid grid-cols-3 gap-px bg-border/45 border border-border/65 rounded-xl overflow-hidden">
               {heroTrust.map(({ icon: Icon, label }) => (
                 <li
                   key={label}
@@ -129,9 +129,9 @@ const Index = () => {
                   </span>
                 </li>
               ))}
-            </ul>
+              </ul>
 
-            <ul className="mt-5 md:mt-10 flex flex-col sm:flex-row sm:flex-wrap gap-y-2 sm:gap-x-8 sm:gap-y-3 text-[0.85rem] md:text-sm text-foreground/82">
+              <ul className="mt-5 md:mt-10 flex flex-col sm:flex-row sm:flex-wrap gap-y-2 sm:gap-x-8 sm:gap-y-3 text-[0.85rem] md:text-sm text-foreground/82">
               <li className="inline-flex items-center gap-2">
                 <MapPin size={15} className="text-primary shrink-0" strokeWidth={1.75} />
                 <span className="leading-snug">{siteContact.addressOneLine}</span>
@@ -142,10 +142,10 @@ const Index = () => {
                   <span className="leading-snug">{siteContact.openingHoursHeroLine}</span>
                 </li>
               )}
-            </ul>
+              </ul>
 
-            {/* Klinik — i panelen (ingen extra högerkolumn / absolute som bröt layouten) */}
-            <div className="mt-6 panel px-5 py-4 flex items-center justify-between gap-4">
+              {/* Klinik — i panelen (ingen extra högerkolumn / absolute som bröt layouten) */}
+              <div className="mt-6 panel px-5 py-4 flex items-center justify-between gap-4">
               <div>
                 <p className="text-[0.6rem] uppercase tracking-[0.18em] text-muted-foreground">
                   Klinik · {siteContact.city}
@@ -158,7 +158,7 @@ const Index = () => {
                 </p>
               </div>
               <Ornament className="text-foreground/25 shrink-0" width={52} glyph="diamond" />
-            </div>
+              </div>
             </div>
           </div>
         </div>
