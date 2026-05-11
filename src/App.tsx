@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import Layout from "./components/layout/Layout";
@@ -7,46 +7,71 @@ import Index from "./pages/Index.tsx"; // startsidan – ladda direkt (LCP)
 /* Tunga / sekundära routes lazy-laddas så startsidan inte drar in
    react-day-picker, Book, Admin etc. innan användaren navigerar dit.
    Detta minskar initial JS från ~900KB till bara det Index behöver. */
-const Treatments       = lazy(() => import("./pages/Treatments.tsx"));
-const TreatmentDetail  = lazy(() => import("./pages/TreatmentDetail.tsx"));
-const About            = lazy(() => import("./pages/About.tsx"));
-const Contact          = lazy(() => import("./pages/Contact.tsx"));
-const Book             = lazy(() => import("./pages/Book.tsx"));
-const Pricing          = lazy(() => import("./pages/Pricing.tsx"));
-const Admin            = lazy(() => import("./pages/Admin.tsx"));
-const AdminAuth        = lazy(() => import("./pages/AdminAuth.tsx"));
-const NotFound         = lazy(() => import("./pages/NotFound.tsx"));
+const loadTreatments = () => import("./pages/Treatments.tsx");
+const loadTreatmentDetail = () => import("./pages/TreatmentDetail.tsx");
+const loadAbout = () => import("./pages/About.tsx");
+const loadContact = () => import("./pages/Contact.tsx");
+const loadBook = () => import("./pages/Book.tsx");
+const loadPricing = () => import("./pages/Pricing.tsx");
+const loadAdmin = () => import("./pages/Admin.tsx");
+const loadAdminAuth = () => import("./pages/AdminAuth.tsx");
+const loadNotFound = () => import("./pages/NotFound.tsx");
+
+const Treatments       = lazy(loadTreatments);
+const TreatmentDetail  = lazy(loadTreatmentDetail);
+const About            = lazy(loadAbout);
+const Contact          = lazy(loadContact);
+const Book             = lazy(loadBook);
+const Pricing          = lazy(loadPricing);
+const Admin            = lazy(loadAdmin);
+const AdminAuth        = lazy(loadAdminAuth);
+const NotFound         = lazy(loadNotFound);
+
+const primaryRoutePreloads = [loadTreatments, loadPricing, loadAbout, loadContact, loadBook];
 
 const PageFallback = () => (
-  <div className="min-h-[50svh] bg-background flex items-center justify-center px-6">
-    <div className="panel px-5 py-4 text-center">
-      <p className="eyebrow text-primary/80">Laddar sida</p>
+  <div className="min-h-[45svh] bg-background flex items-center justify-center px-6">
+    <div className="inline-flex items-center gap-3 rounded-full border border-border/70 bg-card/90 px-5 py-3 shadow-[var(--shadow-card)]">
+      <span className="h-2 w-2 rounded-full bg-primary/70 animate-pulse" aria-hidden />
+      <p className="text-sm font-medium text-muted-foreground">Laddar sida</p>
     </div>
   </div>
 );
 
-const App = () => (
-  <>
-    <Toaster />
-    <BrowserRouter>
-      <Suspense fallback={<PageFallback />}>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Index />} />
-            <Route path="/behandlingar" element={<Treatments />} />
-            <Route path="/behandlingar/:slug" element={<TreatmentDetail />} />
-            <Route path="/om" element={<About />} />
-            <Route path="/kontakt" element={<Contact />} />
-            <Route path="/boka" element={<Book />} />
-            <Route path="/priser" element={<Pricing />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/admin/auth" element={<AdminAuth />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
-  </>
-);
+const App = () => {
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      primaryRoutePreloads.forEach((preload) => {
+        void preload();
+      });
+    }, 250);
+
+    return () => window.clearTimeout(id);
+  }, []);
+
+  return (
+    <>
+      <Toaster />
+      <BrowserRouter>
+        <Suspense fallback={<PageFallback />}>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<Index />} />
+              <Route path="/behandlingar" element={<Treatments />} />
+              <Route path="/behandlingar/:slug" element={<TreatmentDetail />} />
+              <Route path="/om" element={<About />} />
+              <Route path="/kontakt" element={<Contact />} />
+              <Route path="/boka" element={<Book />} />
+              <Route path="/priser" element={<Pricing />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/admin/auth" element={<AdminAuth />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </>
+  );
+};
 
 export default App;
