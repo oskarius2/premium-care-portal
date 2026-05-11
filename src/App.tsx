@@ -3,15 +3,14 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import Layout from "./components/layout/Layout";
 import Index from "./pages/Index.tsx"; // startsidan – ladda direkt (LCP)
+import Book from "./pages/Book.tsx"; // primär CTA – ladda direkt för mjuk navigation
 
-/* Tunga / sekundära routes lazy-laddas så startsidan inte drar in
-   react-day-picker, Book, Admin etc. innan användaren navigerar dit.
-   Detta minskar initial JS från ~900KB till bara det Index behöver. */
+/* Sekundära routes lazy-laddas och förladdas efter första renderingen.
+   Boka är en primär CTA och laddas direkt för att undvika synlig route-flash. */
 const loadTreatments = () => import("./pages/Treatments.tsx");
 const loadTreatmentDetail = () => import("./pages/TreatmentDetail.tsx");
 const loadAbout = () => import("./pages/About.tsx");
 const loadContact = () => import("./pages/Contact.tsx");
-const loadBook = () => import("./pages/Book.tsx");
 const loadPricing = () => import("./pages/Pricing.tsx");
 const loadAdmin = () => import("./pages/Admin.tsx");
 const loadAdminAuth = () => import("./pages/AdminAuth.tsx");
@@ -21,13 +20,12 @@ const Treatments       = lazy(loadTreatments);
 const TreatmentDetail  = lazy(loadTreatmentDetail);
 const About            = lazy(loadAbout);
 const Contact          = lazy(loadContact);
-const Book             = lazy(loadBook);
 const Pricing          = lazy(loadPricing);
 const Admin            = lazy(loadAdmin);
 const AdminAuth        = lazy(loadAdminAuth);
 const NotFound         = lazy(loadNotFound);
 
-const primaryRoutePreloads = [loadTreatments, loadPricing, loadAbout, loadContact, loadBook];
+const primaryRoutePreloads = [loadTreatments, loadPricing, loadAbout, loadContact];
 
 const PageFallback = () => (
   <div className="min-h-[45svh] bg-background flex items-center justify-center px-6">
