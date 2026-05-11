@@ -1,18 +1,18 @@
 import { NavLink } from "react-router-dom";
-import { Home, Sparkles, Calendar, User, MapPin } from "lucide-react";
+import { Home, Sparkles, Calendar, User, MapPin, Tag } from "lucide-react";
 
 const tabs = [
   { to: "/", label: "Hem", icon: Home },
   { to: "/behandlingar", label: "Behandlingar", icon: Sparkles },
   { to: "/boka", label: "Boka", icon: Calendar },
-  { to: "/om", label: "Om oss", icon: User },
+  { to: "/priser", label: "Priser", icon: Tag },
   { to: "/kontakt", label: "Kontakt", icon: MapPin },
 ];
 
 const MobileNav = () => {
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85 border-t border-border/75"
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85 border-t border-border/75"
       aria-label="Mobilnavigation"
     >
       <div className="flex items-stretch justify-around h-16 px-1 safe-area-pb">

@@ -20,7 +20,7 @@ const Layout = () => {
       <Footer />
       <MobileNav />
       {/* Spacer so bottom nav doesn't cover footer content on mobile */}
-      <div className="md:hidden h-16" aria-hidden />
+      <div className="lg:hidden h-16" aria-hidden />
     </div>
   );
 };

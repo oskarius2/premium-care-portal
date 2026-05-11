@@ -1,11 +1,13 @@
 import { Link, NavLink } from "react-router-dom";
+import { Calendar } from "lucide-react";
 import { siteBrand } from "@/config/siteBrand";
 
 const nav = [
-  { to: "/", label: "Hem" },
-  { to: "/behandlingar", label: "Behandlingar" },
-  { to: "/om", label: "Om oss" },
-  { to: "/kontakt", label: "Kontakt" },
+  { to: "/", label: "Hem", description: "Start och introduktion" },
+  { to: "/behandlingar", label: "Behandlingar", description: "Botox och fillers" },
+  { to: "/priser", label: "Priser", description: "Prislista och konsultation" },
+  { to: "/om", label: "Om oss", description: "Klinik och arbetssätt" },
+  { to: "/kontakt", label: "Kontakt", description: "Adress och uppgifter" },
 ];
 
 const Header = () => {
@@ -15,11 +17,11 @@ const Header = () => {
     : null;
 
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85 border-b border-border/75">
-      <div className="container-wide flex items-center justify-between h-14 sm:h-16 md:h-24">
+    <header className="sticky top-0 z-50 border-b border-border/70 bg-background/90 shadow-[0_1px_0_rgba(255,255,255,0.78)_inset,0_18px_36px_-32px_rgba(50,63,44,0.45)] backdrop-blur-xl supports-[backdrop-filter]:bg-background/78">
+      <div className="container-wide flex items-center justify-between h-14 sm:h-16 lg:h-24 gap-3">
         <Link
           to="/"
-          className="flex items-center leading-none gap-2.5 sm:gap-3 min-w-0"
+          className="group flex items-center leading-none gap-2.5 sm:gap-3 min-w-0 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           aria-label={ariaHome}
         >
           {/* Desktop: full logo image */}
@@ -27,14 +29,14 @@ const Header = () => {
             <img
               src={logoSrc}
               alt=""
-              className="hidden md:block h-11 w-auto max-w-[14rem] object-contain object-left shrink-0"
+              className="hidden lg:block h-11 w-auto max-w-[14rem] object-contain object-left shrink-0 transition-transform duration-200 group-hover:scale-[1.015]"
               width={180}
               height={44}
               decoding="async"
             />
           )}
           {/* Mobile/tablet: monogram + text for legibility */}
-          <span className="flex md:hidden items-center gap-2.5">
+          <span className="flex lg:hidden items-center gap-2.5">
             <span className="relative inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-2xl border border-primary/35 bg-white/85 text-primary shadow-[0_8px_20px_-14px_rgba(67,85,65,0.45)] shrink-0 overflow-hidden">
               <span className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-primary/12" aria-hidden />
               <span className="absolute -bottom-2 -right-1 w-5 h-5 rounded-full bg-accent/15" aria-hidden />
@@ -48,7 +50,7 @@ const Header = () => {
           </span>
           {/* Fallback if no logo image (desktop) */}
           {!logoSrc && (
-            <span className="hidden md:flex items-center gap-3">
+            <span className="hidden lg:flex items-center gap-3">
               <span className="relative inline-flex items-center justify-center w-11 h-11 rounded-2xl border border-primary/35 bg-white/85 text-primary shadow-[0_8px_20px_-14px_rgba(67,85,65,0.45)] shrink-0 overflow-hidden">
                 <span className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-primary/12" aria-hidden />
                 <span className="absolute -bottom-2 -right-1 w-5 h-5 rounded-full bg-accent/15" aria-hidden />
@@ -71,25 +73,31 @@ const Header = () => {
           )}
         </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-1" aria-label="Huvudmeny">
-          {nav.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === "/"}
-              className={({ isActive }) =>
-                `relative px-4 py-2 text-sm font-medium tracking-tight transition-colors ${
-                  isActive
-                    ? "text-primary after:absolute after:left-1/2 after:-translate-x-1/2 after:-bottom-[1.05rem] after:w-1 after:h-1 after:rounded-full after:bg-primary"
-                    : "text-foreground/70 hover:text-foreground"
-                }`
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
-          <Link to="/boka" className="btn-primary btn-compact ml-4">
+        {/* Desktop nav — pill-shaped container (from main) */}
+        <nav
+          className="hidden lg:flex items-center gap-2 rounded-full border border-border/70 bg-white/55 p-1 shadow-[0_1px_0_rgba(255,255,255,0.82)_inset,0_14px_30px_-24px_rgba(50,63,44,0.38)]"
+          aria-label="Huvudmeny"
+        >
+          <div className="flex items-center gap-0.5">
+            {nav.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === "/"}
+                className={({ isActive }) =>
+                  `relative rounded-full px-3.5 xl:px-4 py-2 text-sm font-semibold tracking-[-0.01em] transition-[background-color,border-color,color,box-shadow,transform] duration-200 ${
+                    isActive
+                      ? "bg-accent-soft text-accent-deep shadow-[0_1px_0_rgba(255,255,255,0.8)_inset,0_10px_22px_-18px_rgba(50,63,44,0.52)]"
+                      : "text-foreground/68 hover:-translate-y-0.5 hover:bg-white/70 hover:text-foreground"
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </div>
+          <Link to="/boka" className="btn-primary btn-compact ml-1">
+            <Calendar size={16} strokeWidth={1.75} />
             Boka tid
           </Link>
         </nav>
@@ -97,10 +105,11 @@ const Header = () => {
         {/* Mobile: "Boka" CTA in header */}
         <Link
           to="/boka"
-          className="md:hidden btn-primary btn-compact"
+          className="lg:hidden btn-primary btn-compact"
           aria-label="Boka tid"
         >
-          Boka
+          <Calendar size={16} strokeWidth={1.75} className="-ml-0.5" />
+          <span className="hidden xs:inline">Boka</span>
         </Link>
       </div>
     </header>
