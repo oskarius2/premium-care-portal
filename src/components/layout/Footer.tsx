@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Phone, MapPin, Mail } from "lucide-react";
 import { siteContact } from "@/config/siteContact";
-import { siteBrand } from "@/config/siteBrand";
+import { siteBookingNotice, siteBrand } from "@/config/siteBrand";
 import { TelLink, MailLink } from "@/components/ContactAnchors";
 import { Ornament } from "@/components/ui/Ornament";
 
@@ -28,7 +28,7 @@ const Footer = () => {
             — {siteBrand.tagline} —
           </p>
           <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-            Medicinsk skönhetsklinik med legitimerade sjuksköterskor. Behandlingar planeras efter individuell konsultation i {siteContact.city}.
+            Medicinsk skönhetsklinik med legitimerade sjuksköterskor. Första bokningen är konsultation i {siteContact.city}; behandling planeras efter 48 timmars betänketid.
           </p>
         </div>
 
@@ -104,8 +104,11 @@ const Footer = () => {
           )}
 
           <Link to="/boka" className="btn-primary mt-7 w-full">
-            Boka tid
+            Boka konsultation
           </Link>
+          <p className="text-xs text-muted-foreground leading-relaxed mt-4">
+            {siteBookingNotice}
+          </p>
         </div>
       </div>
 

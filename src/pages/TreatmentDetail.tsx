@@ -1,7 +1,7 @@
 import { Link, useParams, Navigate } from "react-router-dom";
 import { Check, ArrowLeft, Calendar } from "lucide-react";
 import { treatments } from "@/data/treatments";
-import { siteMedicalDisclaimer } from "@/config/siteBrand";
+import { siteBookingNotice, siteMedicalDisclaimer } from "@/config/siteBrand";
 import { Ornament } from "@/components/ui/Ornament";
 
 const TreatmentDetail = () => {
@@ -49,10 +49,14 @@ const TreatmentDetail = () => {
               {t.what}
             </p>
 
+            <p className="mt-5 rounded-2xl bg-primary/5 border border-primary/20 px-4 py-3 text-sm text-muted-foreground leading-relaxed">
+              {siteBookingNotice}
+            </p>
+
             <hr className="hairline my-6 sm:my-8" />
 
             <p className="text-[0.7rem] uppercase tracking-[0.16em] text-muted-foreground mb-3 sm:mb-4">
-              Det här ingår
+              Konsultation och information
             </p>
             <ul className="space-y-2.5 mb-6 sm:mb-8">
               {t.includes.map((item) => (
@@ -71,7 +75,7 @@ const TreatmentDetail = () => {
             <dl className="grid grid-cols-2 gap-3 sm:gap-6 mb-6 sm:mb-8">
               <div className="rounded-2xl border border-border/75 bg-card px-4 sm:px-0 py-3.5 sm:py-0 sm:border-0">
                 <dt className="text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.16em] text-muted-foreground mb-1">
-                  Tidsåtgång
+                  Vid behandling
                 </dt>
                 <dd className="font-serif text-[1.05rem] sm:text-xl text-foreground">
                   {t.duration}
@@ -91,11 +95,11 @@ const TreatmentDetail = () => {
               to={`/boka?treatment=${encodeURIComponent(t.slug)}`}
               className="btn-primary btn-large w-full sm:w-auto justify-center"
             >
-              <Calendar size={20} strokeWidth={1.75} /> Boka tid
+              <Calendar size={20} strokeWidth={1.75} /> Boka konsultation
             </Link>
 
             <p className="text-[0.72rem] sm:text-xs text-muted-foreground mt-8 sm:mt-10 max-w-xl leading-relaxed border-t border-border/75 pt-6 sm:pt-7">
-              {siteMedicalDisclaimer} Produktnamn och beskrivningar är översiktliga; exakt indikation och kontraindikationer enligt aktuellt informationsmaterial tillämpas vid konsultation.
+              {siteMedicalDisclaimer} Produktnamn och beskrivningar är översiktliga; exakt indikation och kontraindikationer enligt aktuellt informationsmaterial tillämpas vid konsultation. Behandling utförs inte vid första bokningstillfället.
             </p>
           </div>
         </div>

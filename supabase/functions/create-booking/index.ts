@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
     const BETANKETID_MS = 48 * 60 * 60 * 1000;
     const slotDateTime = new Date(`${booking_date}T${start_time.length === 5 ? start_time + ":00" : start_time}`);
     if (slotDateTime.getTime() - Date.now() < BETANKETID_MS) {
-      return json({ error: "Bokningen måste ligga minst 48 timmar fram i tiden (betänketid)" }, 400);
+      return json({ error: "Tiden måste ligga minst 48 timmar fram i tiden enligt 48h-regeln för betänketid" }, 400);
     }
 
     const supabase = createClient(
@@ -190,8 +190,8 @@ Deno.serve(async (req) => {
         });
         const treatmentList = treatments.map((t) => t.name).join(" + ");
         const subject = treatments.length > 1
-          ? `Bokningsbekräftelse – ${treatments.length} behandlingar`
-          : `Bokningsbekräftelse – ${treatments[0].name}`;
+          ? `Konsultationsbekräftelse – ${treatments.length} områden`
+          : `Konsultationsbekräftelse – ${treatments[0].name}`;
 
         const resendRes = await fetch("https://api.resend.com/emails", {
           method: "POST",
@@ -257,18 +257,18 @@ function emailHtml({ name, treatment, date, time }: {
         <tr>
           <td style="padding:48px 48px 40px;">
             <p style="margin:0 0 8px;font-size:10px;letter-spacing:3px;color:#c0606a;text-transform:uppercase;">
-              Bokningsbekräftelse
+              Konsultationsbekräftelse
             </p>
             <h1 style="margin:0 0 32px;font-size:28px;font-weight:normal;color:#1a1614;line-height:1.2;">
               Välkommen, ${escapeHtml(name)}.
             </h1>
             <p style="margin:0 0 32px;font-size:15px;color:#555;line-height:1.7;font-family:sans-serif;">
-              Din bokning är bekräftad. Vi ser fram emot att välkomna dig.
+              Din konsultation är bekräftad. Första besöket gäller konsultation och viktig information, inte behandling.
             </p>
             <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e8e2dd;margin-bottom:32px;">
               <tr>
                 <td style="padding:20px 24px;border-bottom:1px solid #e8e2dd;">
-                  <p style="margin:0 0 4px;font-size:9px;letter-spacing:3px;color:#999;text-transform:uppercase;font-family:sans-serif;">Behandling</p>
+                  <p style="margin:0 0 4px;font-size:9px;letter-spacing:3px;color:#999;text-transform:uppercase;font-family:sans-serif;">Konsultation om</p>
                   <p style="margin:0;font-size:16px;color:#1a1614;">${escapeHtml(treatment)}</p>
                 </td>
               </tr>
@@ -285,6 +285,9 @@ function emailHtml({ name, treatment, date, time }: {
                 </td>
               </tr>
             </table>
+            <p style="margin:0 0 8px;font-size:13px;color:#777;line-height:1.7;font-family:sans-serif;">
+              För estetiska injektionsbehandlingar gäller 48 timmars betänketid efter konsultation. Eventuell behandling planeras först därefter.
+            </p>
             <p style="margin:0 0 8px;font-size:13px;color:#777;line-height:1.7;font-family:sans-serif;">
               Vid frågor eller avbokning (senast 24 timmar innan) — kontakta oss direkt.
             </p>

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Check, Calendar, Sparkles } from "lucide-react";
 import { treatments } from "@/data/treatments";
-import { siteMedicalDisclaimer } from "@/config/siteBrand";
+import { siteBookingNotice, siteMedicalDisclaimer } from "@/config/siteBrand";
 import { Ornament } from "@/components/ui/Ornament";
 
 const Treatments = () => {
@@ -22,7 +22,7 @@ const Treatments = () => {
           </h1>
 
           <p className="lead mt-4 sm:mt-5 md:mt-7 max-w-3xl">
-            Vi gör medvetet två saker — fillers med Revolax Fine och botox med Dysport — och vi gör dem ordentligt. Det betyder noggrann konsultation, individuell bedömning och realistiska förväntningar innan något utförs.
+            Vi gör medvetet två saker — fillers med Revolax Fine och botox med Dysport — och vi gör dem ordentligt. Det betyder noggrann konsultation, individuell bedömning, 48 timmars betänketid och realistiska förväntningar innan något utförs.
           </p>
 
           <div className="mt-8 sm:mt-10 w-full grid grid-cols-1 md:grid-cols-3 gap-px grid-divided text-left">
@@ -50,13 +50,13 @@ const Treatments = () => {
                 Konsultation först
               </p>
               <p className="text-[0.92rem] sm:text-sm text-muted-foreground mt-2 sm:mt-3 leading-relaxed">
-                Behandlingsval och planering görs alltid efter individuell bedömning — aldrig som färdigt standardpaket.
+                Första bokningstillfället är endast konsultation och information. Behandling planeras först efter 48 timmars betänketid.
               </p>
             </div>
           </div>
 
           <p className="text-xs text-muted-foreground mt-7 sm:mt-9 leading-relaxed border-t border-border/75 pt-6 sm:pt-7 max-w-3xl">
-            {siteMedicalDisclaimer}
+            {siteBookingNotice} {siteMedicalDisclaimer}
           </p>
         </div>
       </section>
@@ -99,7 +99,7 @@ const Treatments = () => {
 
                   <div className="mt-5 sm:mt-6 rounded-2xl bg-accent-soft/55 border border-border/70 px-4 sm:px-5 py-4">
                     <p className="text-[0.62rem] sm:text-[0.65rem] uppercase tracking-[0.16em] text-muted-foreground mb-2.5 sm:mb-3">
-                      Det här ingår
+                      Första konsultationen
                     </p>
                     <ul className="space-y-2 sm:space-y-2.5">
                       {t.includes.slice(0, 3).map((item) => (
@@ -117,7 +117,7 @@ const Treatments = () => {
                   <div className="grid grid-cols-2 gap-3 mt-5 sm:mt-6">
                     <div className="rounded-xl border border-border/75 bg-background px-3.5 sm:px-4 py-3">
                       <p className="text-[0.62rem] sm:text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground mb-0.5">
-                        Tidsåtgång
+                        Vid behandling
                       </p>
                       <p className="font-serif text-[1rem] sm:text-[1.1rem] text-foreground">
                         {t.duration}
@@ -141,7 +141,7 @@ const Treatments = () => {
                       to={`/boka?treatment=${encodeURIComponent(t.slug)}`}
                       className="btn-primary btn-card-pair"
                     >
-                      <Sparkles size={16} strokeWidth={1.75} /> Boka
+                      <Sparkles size={16} strokeWidth={1.75} /> Boka konsultation
                     </Link>
                   </div>
                 </div>
@@ -155,6 +155,7 @@ const Treatments = () => {
             </Link>
             <p className="text-[0.85rem] sm:text-sm text-muted-foreground mt-4 sm:mt-5 max-w-md mx-auto leading-relaxed">
               Osäker på vilken behandling som passar? Boka en konsultation så avgör vi det tillsammans.
+              Behandling kan planeras först efter 48 timmars betänketid.
             </p>
           </div>
         </div>

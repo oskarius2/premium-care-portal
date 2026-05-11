@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Phone, Mail, MapPin, Clock, Calendar } from "lucide-react";
-import { siteBrand, siteMedicalDisclaimer } from "@/config/siteBrand";
+import { siteBookingNotice, siteBrand, siteMedicalDisclaimer } from "@/config/siteBrand";
 import { siteContact } from "@/config/siteContact";
 import { TelSurfaceLink, MailSurfaceLink } from "@/components/ContactAnchors";
 import { Ornament } from "@/components/ui/Ornament";
@@ -35,7 +35,7 @@ const Contact = () => {
           </p>
 
           <p className="text-xs text-muted-foreground max-w-2xl leading-relaxed border-t border-border/75 pt-6 sm:pt-7 mt-7 sm:mt-9">
-            {siteMedicalDisclaimer}
+            {siteBookingNotice} {siteMedicalDisclaimer}
           </p>
         </div>
       </section>
@@ -154,7 +154,7 @@ const Contact = () => {
 
           <div className="text-center mt-10 sm:mt-12 md:mt-16">
             <Link to="/boka" className="btn-primary btn-large w-full sm:w-auto justify-center">
-              <Calendar size={20} strokeWidth={1.75} /> Boka tid online istället
+              <Calendar size={20} strokeWidth={1.75} /> Boka konsultation online
             </Link>
           </div>
         </div>

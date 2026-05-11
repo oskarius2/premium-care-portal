@@ -12,7 +12,7 @@ import {
   ScanLine,
 } from "lucide-react";
 import heroImg from "@/assets/clinic/hero-clinic.png";
-import { siteBrand, siteMedicalDisclaimer } from "@/config/siteBrand";
+import { siteBookingNotice, siteBrand, siteMedicalDisclaimer } from "@/config/siteBrand";
 import { siteContact } from "@/config/siteContact";
 import { HeroMedia } from "@/components/HeroMedia";
 import { Ornament } from "@/components/ui/Ornament";
@@ -46,23 +46,23 @@ const signaturePillars = [
 const processSteps = [
   {
     n: "01",
-    title: "Första kontakt",
-    body: "Boka online eller hör av dig direkt. Vi återkopplar med tid och eventuella förberedelser inför ditt besök.",
+    title: "Boka konsultation",
+    body: "Boka online eller hör av dig direkt. Det första besöket är konsultation och viktig information, inte en behandlingstid.",
   },
   {
     n: "02",
     title: "Konsultation",
-    body: "Vi går igenom mål, hudstatus, historik och vad som faktiskt är rimligt att uppnå med aktuell behandling.",
+    body: "Vi går igenom mål, hudstatus, historik, risker och vad som faktiskt är rimligt att uppnå med aktuell behandling.",
   },
   {
     n: "03",
-    title: "Behandling",
-    body: "Varje moment utförs med aseptisk teknik, dokumentation och tydlig vägledning genom hela besöket.",
+    title: "48 h betänketid",
+    body: "Efter konsultation gäller 48 timmars betänketid innan estetisk injektionsbehandling kan utföras eller bokas in.",
   },
   {
     n: "04",
-    title: "Eftervård",
-    body: "Du får konkreta råd, realistisk tidslinje och tydlig kontaktväg om något behöver följas upp efteråt.",
+    title: "Behandling & eftervård",
+    body: "Om du vill gå vidare planeras behandlingen efter betänketiden, med aseptisk teknik, dokumentation och tydlig eftervård.",
   },
 ];
 
@@ -77,7 +77,11 @@ const faqs = [
   },
   {
     q: "Vad händer om jag bokar fel behandling?",
-    a: "Då justeras planen. Rätt behandling väljs först efter medicinsk bedömning, så bokningen online fungerar som ett första steg — inte ett låst beslut.",
+    a: "Då justeras planen. Rätt behandling väljs först efter medicinsk bedömning, så bokningen online fungerar som konsultation och första steg — inte ett låst beslut.",
+  },
+  {
+    q: "Varför bokar jag konsultation först?",
+    a: "För estetiska injektionsbehandlingar behöver du få individuell information och därefter 48 timmars betänketid innan behandling kan utföras. Första bokningstillfället är därför endast konsultation.",
   },
   {
     q: "Varför är tonen så medicinsk?",
@@ -224,7 +228,7 @@ const Index = () => {
             eyebrow="Våra behandlingar"
             title="Två behandlingar."
             accent="En medicinsk standard."
-            lead="Vi har medvetet hållit utbudet smalt — fillers med Revolax Fine och botox med Dysport — för att kunna hålla riktigt hög nivå på konsultation, bedömning och utförande i varje behandling."
+            lead="Vi har medvetet hållit utbudet smalt — fillers med Revolax Fine och botox med Dysport — för att kunna hålla riktigt hög nivå på konsultation, bedömning, 48 timmars betänketid och utförande i varje behandling."
             align="center"
             className="mb-10 sm:mb-12 md:mb-16 mx-auto"
           />
@@ -279,7 +283,7 @@ const Index = () => {
                       Läs mer <ArrowUpRight size={16} strokeWidth={1.75} />
                     </Link>
                     <Link to={`/boka?treatment=${encodeURIComponent(t.slug)}`} className="btn-primary btn-card-pair">
-                      Boka
+                      Boka konsultation
                     </Link>
                   </div>
                 </div>
@@ -366,7 +370,8 @@ const Index = () => {
           </h2>
 
           <p className="text-primary-foreground/80 text-[0.95rem] sm:text-base md:text-lg leading-relaxed mt-5 sm:mt-6 max-w-xl">
-            Konsultationen är till för att lyssna, undersöka och föreslå. Du bestämmer själv om och när du vill gå vidare med en behandling.
+            Konsultationen är till för att lyssna, undersöka och föreslå. Efteråt har du
+            48 timmars betänketid innan eventuell behandling kan planeras.
           </p>
 
           <div className="mt-7 sm:mt-9 flex flex-col sm:flex-row gap-3 w-full max-w-md sm:max-w-none sm:w-auto">
@@ -379,7 +384,7 @@ const Index = () => {
           </div>
 
           <p className="text-[0.72rem] sm:text-[0.75rem] text-primary-foreground/60 mt-10 sm:mt-12 max-w-xl leading-relaxed">
-            {siteMedicalDisclaimer}
+            {siteBookingNotice} {siteMedicalDisclaimer}
           </p>
         </div>
       </section>

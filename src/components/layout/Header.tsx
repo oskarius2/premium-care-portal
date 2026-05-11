@@ -98,7 +98,7 @@ const Header = () => {
           </div>
           <Link to="/boka" className="btn-primary btn-compact ml-1">
             <Calendar size={16} strokeWidth={1.75} />
-            Boka tid
+            Boka konsultation
           </Link>
         </nav>
 
@@ -106,7 +106,7 @@ const Header = () => {
         <Link
           to="/boka"
           className="lg:hidden btn-primary btn-compact"
-          aria-label="Boka tid"
+          aria-label="Boka konsultation"
         >
           <Calendar size={16} strokeWidth={1.75} className="-ml-0.5" />
           <span className="hidden xs:inline">Boka</span>
