@@ -73,9 +73,14 @@ Deno.serve(async (req) => {
       return json({ error: "Tiden måste ligga minst 48 timmar fram i tiden enligt 48h-regeln för betänketid" }, 400);
     }
 
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? Deno.env.get("SERVICE_ROLE_KEY");
+    if (!serviceRoleKey) {
+      return json({ error: "Supabase service role key is not configured" }, 500);
+    }
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      serviceRoleKey
     );
 
     // Hämta alla behandlingar i den ordning klienten skickade dem
