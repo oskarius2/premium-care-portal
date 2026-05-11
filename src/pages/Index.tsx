@@ -8,6 +8,7 @@ import {
   ShieldCheck,
   Sparkles,
   ArrowUpRight,
+  ChevronRight,
   Check,
   ScanLine,
 } from "lucide-react";
@@ -17,6 +18,7 @@ import { siteContact } from "@/config/siteContact";
 import { HeroMedia } from "@/components/HeroMedia";
 import { Ornament } from "@/components/ui/Ornament";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import PageFlowNav from "@/components/layout/PageFlowNav";
 import { treatments } from "@/data/treatments";
 
 const heroTrust = [
@@ -43,50 +45,11 @@ const signaturePillars = [
   },
 ];
 
-const processSteps = [
-  {
-    n: "01",
-    title: "Boka konsultation",
-    body: "Boka online eller hör av dig direkt. Det första besöket är konsultation och viktig information, inte en behandlingstid.",
-  },
-  {
-    n: "02",
-    title: "Konsultation",
-    body: "Vi går igenom mål, hudstatus, historik, risker och vad som faktiskt är rimligt att uppnå med aktuell behandling.",
-  },
-  {
-    n: "03",
-    title: "48 h betänketid",
-    body: "Efter konsultation gäller 48 timmars betänketid innan estetisk injektionsbehandling kan utföras eller bokas in.",
-  },
-  {
-    n: "04",
-    title: "Behandling & eftervård",
-    body: "Om du vill gå vidare planeras behandlingen efter betänketiden, med aseptisk teknik, dokumentation och tydlig eftervård.",
-  },
-];
-
-const faqs = [
-  {
-    q: "Hur vet jag vilken behandling som passar mig?",
-    a: "Det avgörs i konsultationen. Behandlingen väljs utifrån hud, anatomi, mål och historik — inte utifrån vilken produkt som låter mest exklusiv.",
-  },
-  {
-    q: "Kommer resultatet att se naturligt ut?",
-    a: "Det är ambitionen. Kliniken är utformad kring gradvisa förbättringar i hudkvalitet, balans och uttryck snarare än snabba, hårda förändringar.",
-  },
-  {
-    q: "Vad händer om jag bokar fel behandling?",
-    a: "Då justeras planen. Rätt behandling väljs först efter medicinsk bedömning, så bokningen online fungerar som konsultation och första steg — inte ett låst beslut.",
-  },
-  {
-    q: "Varför bokar jag konsultation först?",
-    a: "För estetiska injektionsbehandlingar behöver du få individuell information och därefter 48 timmars betänketid innan behandling kan utföras. Första bokningstillfället är därför endast konsultation.",
-  },
-  {
-    q: "Varför är tonen så medicinsk?",
-    a: "För att injektionsbehandling är vårdnära. Den kan vara varm, estetisk och välkomnande — men den ska fortfarande kännas seriös, tydlig och trygg.",
-  },
+const pageHighlights = [
+  { to: "/behandlingar", title: "Behandlingar", body: "Se hela utbudet med tydliga jämförelser och nästa steg." },
+  { to: "/priser", title: "Priser", body: "Få snabb överblick över prisnivåer och konsultationsupplägg." },
+  { to: "/om", title: "Om oss", body: "Läs om arbetssätt, medicinsk standard och klinikens profil." },
+  { to: "/kontakt", title: "Kontakt", body: "Hitta adress, öppettider och enklaste vägen till oss." },
 ];
 
 const Index = () => {
@@ -296,62 +259,32 @@ const Index = () => {
       <section className="section-y-sm bg-surface border-y border-border/75">
         <div className="container-wide">
           <SectionHeader
-            eyebrow="Så går det till"
-            title="Från första kontakt"
-            accent="till uppföljning"
-            lead="Varje besök följer samma struktur — så att du vet vad som händer, varför det görs och vad du kan förvänta dig efteråt."
+            eyebrow="Navigera sida för sida"
+            title="Korta vägar"
+            accent="till rätt innehåll"
+            lead="Hellre tydliga undersidor än lång scroll. Välj vart du vill gå vidare."
             align="center"
-            className="mb-10 sm:mb-14 md:mb-20 mx-auto"
+            className="mb-8 sm:mb-10 md:mb-12 mx-auto"
           />
 
-          <ol className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
-            {processSteps.map((step) => (
-              <li
-                key={step.n}
-                className="panel p-6 sm:p-7 md:p-8 lg:p-9 flex flex-col min-h-full"
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 md:gap-5 max-w-5xl mx-auto">
+            {pageHighlights.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="group panel p-5 sm:p-6 md:p-7 transition-colors hover:border-primary/35"
               >
-                <div className="flex items-baseline gap-3 sm:gap-4 mb-4 sm:mb-6">
-                  <span className="font-serif italic text-[2.1rem] sm:text-[2.5rem] lg:text-[3rem] leading-none text-primary/80 select-none">
-                    {step.n}
-                  </span>
-                  <span className="hairline flex-1" />
-                </div>
-                <h3 className="font-serif text-[1.4rem] sm:text-2xl leading-snug tracking-tight text-foreground mb-2 sm:mb-3">
-                  {step.title}
-                </h3>
-                <p className="text-muted-foreground text-[0.92rem] sm:text-[0.95rem] leading-relaxed">
-                  {step.body}
+                <p className="font-serif text-[1.35rem] sm:text-[1.55rem] leading-tight tracking-tight text-foreground group-hover:text-primary transition-colors">
+                  {item.title}
                 </p>
-              </li>
+                <p className="text-muted-foreground text-[0.92rem] sm:text-[0.95rem] leading-relaxed mt-2 sm:mt-2.5">
+                  {item.body}
+                </p>
+                <span className="inline-flex items-center gap-2 text-[0.72rem] uppercase tracking-[0.12em] text-primary mt-4">
+                  Gå till sida <ChevronRight size={14} />
+                </span>
+              </Link>
             ))}
-          </ol>
-        </div>
-      </section>
-
-      <section className="section-y-sm">
-        <div className="container-wide">
-          <SectionHeader
-            eyebrow="Vanliga frågor"
-            title="Det du brukar"
-            accent="undra över först"
-            lead="Korta, raka svar på det de flesta tänker innan de bokar. Resten går vi igenom tillsammans i konsultationen."
-            align="center"
-            className="mb-10 sm:mb-14 md:mb-20 mx-auto"
-          />
-
-          <div className="max-w-3xl mx-auto">
-            <dl className="border-t border-border/75">
-              {faqs.map((f) => (
-                <div key={f.q} className="border-b border-border/75 py-4 sm:py-5 md:py-6">
-                  <dt className="font-serif text-[1.05rem] sm:text-[1.125rem] md:italic md:text-[1.375rem] text-foreground leading-snug mb-2 sm:mb-2.5 md:mb-3 text-balance">
-                    {f.q}
-                  </dt>
-                  <dd className="text-muted-foreground text-[0.92rem] sm:text-[0.95rem] md:text-base leading-relaxed">
-                    {f.a}
-                  </dd>
-                </div>
-              ))}
-            </dl>
           </div>
         </div>
       </section>
@@ -386,6 +319,12 @@ const Index = () => {
           <p className="text-[0.72rem] sm:text-[0.75rem] text-primary-foreground/60 mt-10 sm:mt-12 max-w-xl leading-relaxed">
             {siteBookingNotice} {siteMedicalDisclaimer}
           </p>
+        </div>
+      </section>
+
+      <section className="section-y-sm">
+        <div className="container-wide">
+          <PageFlowNav currentPath="/" />
         </div>
       </section>
     </>

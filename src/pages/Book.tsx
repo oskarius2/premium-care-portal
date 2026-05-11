@@ -23,6 +23,7 @@ import { treatments, type Treatment } from "@/data/treatments";
 import { siteBookingNotice } from "@/config/siteBrand";
 import { siteContact } from "@/config/siteContact";
 import { TelLink } from "@/components/ContactAnchors";
+import PageFlowNav from "@/components/layout/PageFlowNav";
 
 /**
  * Formatera ett Date-objekt som lokalt YYYY-MM-DD.
@@ -274,7 +275,7 @@ export default function Book() {
   }
 
   return (
-    <section className="py-8 md:py-14">
+    <section className="page-shell">
       <div className="container-page">
         {/* Sidhuvud */}
         <div className="max-w-2xl mb-8 md:mb-12">
@@ -559,6 +560,8 @@ export default function Book() {
             <BookingSummary state={state} treatment={selectedTreatment} />
           </div>
         </div>
+
+        <PageFlowNav currentPath="/boka" />
       </div>
     </section>
   );

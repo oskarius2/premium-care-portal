@@ -3,6 +3,7 @@ import { Check, ArrowLeft, Calendar } from "lucide-react";
 import { treatments } from "@/data/treatments";
 import { siteBookingNotice, siteMedicalDisclaimer } from "@/config/siteBrand";
 import { Ornament } from "@/components/ui/Ornament";
+import PageFlowNav from "@/components/layout/PageFlowNav";
 
 const TreatmentDetail = () => {
   const { slug } = useParams();
@@ -101,6 +102,8 @@ const TreatmentDetail = () => {
             <p className="text-[0.72rem] sm:text-xs text-muted-foreground mt-8 sm:mt-10 max-w-xl leading-relaxed border-t border-border/75 pt-6 sm:pt-7">
               {siteMedicalDisclaimer} Produktnamn och beskrivningar är översiktliga; exakt indikation och kontraindikationer enligt aktuellt informationsmaterial tillämpas vid konsultation. Behandling utförs inte vid första bokningstillfället.
             </p>
+
+            <PageFlowNav currentPath="/behandlingar" />
           </div>
         </div>
       </div>

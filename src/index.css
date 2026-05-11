@@ -56,6 +56,7 @@
 
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
   }
 
   body {
@@ -63,7 +64,7 @@
     font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
     font-feature-settings: "kern" 1;
     font-size: 16px;
-    line-height: 1.65;
+    line-height: 1.7;
     letter-spacing: -0.011em;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -112,11 +113,11 @@
   }
 
   .section-y {
-    @apply py-14 sm:py-20 md:py-28 lg:py-40;
+    @apply py-12 sm:py-16 md:py-20 lg:py-24;
   }
 
   .section-y-sm {
-    @apply py-12 sm:py-16 md:py-24 lg:py-28;
+    @apply py-10 sm:py-14 md:py-16 lg:py-20;
   }
 
   .hairline {
@@ -155,54 +156,54 @@
     @apply gap-px bg-border/45 border border-border/65 rounded-2xl overflow-hidden;
   }
 
-  /* Knappar — statement: mer identitet, mer djup, tydlig premium-signatur */
+  /* Knappar — mer läsbar och konsekvent touch-ytor */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-2xl
-           bg-[linear-gradient(135deg,hsl(96_24%_40%)_0%,hsl(96_18%_33%)_48%,hsl(97_18%_26%)_100%)]
-           text-primary-foreground font-semibold text-[0.97rem] tracking-[0.035em]
-           border border-[hsl(97_20%_24%/0.62)]
-           shadow-[0_1px_0_rgba(255,255,255,0.15)_inset,0_18px_36px_-20px_rgba(50,63,44,0.62),0_10px_24px_-18px_rgba(50,63,44,0.7)]
-           hover:shadow-[0_1px_0_rgba(255,255,255,0.24)_inset,0_24px_44px_-20px_rgba(50,63,44,0.72),0_14px_32px_-20px_rgba(50,63,44,0.82)]
-           hover:-translate-y-1 hover:brightness-110
-           active:translate-y-0 active:brightness-100 active:opacity-[0.95]
+    @apply inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl
+           bg-[linear-gradient(145deg,hsl(96_22%_39%)_0%,hsl(96_18%_32%)_52%,hsl(97_18%_26%)_100%)]
+           text-primary-foreground font-semibold text-[0.96rem] tracking-[0.02em]
+           border border-[hsl(97_20%_23%/0.7)]
+           shadow-[0_1px_0_rgba(255,255,255,0.15)_inset,0_12px_28px_-16px_rgba(50,63,44,0.62)]
+           hover:shadow-[0_1px_0_rgba(255,255,255,0.22)_inset,0_16px_32px_-16px_rgba(50,63,44,0.72)]
+           hover:-translate-y-0.5 hover:brightness-105
+           active:translate-y-0 active:brightness-100 active:opacity-[0.94]
            disabled:pointer-events-none disabled:opacity-50
            transition-[box-shadow,opacity,transform,filter] duration-200 ease-out
-           min-h-[52px]
+           min-h-[50px]
            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-2xl
+    @apply inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl
            bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(255,255,255,0.92))]
-           text-foreground font-semibold text-[0.97rem] tracking-[0.03em]
+           text-foreground font-semibold text-[0.96rem] tracking-[0.02em]
            border border-[hsl(var(--foreground)/0.18)]
-           shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_12px_26px_-22px_rgba(50,63,44,0.45)]
+           shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_10px_22px_-20px_rgba(50,63,44,0.45)]
            hover:border-[hsl(var(--foreground)/0.34)] hover:bg-[linear-gradient(180deg,rgba(255,255,255,1),rgba(245,244,238,0.98))]
            hover:-translate-y-0.5 hover:shadow-[0_16px_30px_-20px_rgba(50,63,44,0.55)]
            active:translate-y-0 active:opacity-[0.95]
            disabled:pointer-events-none disabled:opacity-50
            transition-[background-color,border-color,box-shadow,color,opacity,transform] duration-200 ease-out
-           min-h-[52px]
+           min-h-[50px]
            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
 
   .btn-large {
-    @apply text-[0.98rem] md:text-[1.08rem] px-9 md:px-11 py-4 md:py-[1.1rem] min-h-[56px] md:min-h-[60px];
+    @apply text-[0.97rem] md:text-[1.04rem] px-8 md:px-10 py-3.5 md:py-4 min-h-[54px] md:min-h-[58px];
   }
 
   /** Header / verktygsrad — något tätare än standard */
   .btn-compact {
-    @apply text-[0.78rem] sm:text-[0.8125rem] md:text-sm px-4 sm:px-6 py-2.5 min-h-[44px] md:min-h-[46px] md:px-7 md:py-2.5 tracking-[0.03em] rounded-2xl;
+    @apply text-[0.78rem] sm:text-[0.8125rem] md:text-sm px-4 sm:px-6 py-2.5 min-h-[42px] md:min-h-[44px] md:px-7 md:py-2.5 tracking-[0.03em] rounded-xl;
   }
 
   /** Två knappar bredvid varandra i kort (behandlingslista) */
   .btn-card-pair {
-    @apply flex-1 min-w-0 justify-center text-[0.93rem] sm:text-[0.97rem] px-4 sm:px-5 py-3.5 min-h-[52px] sm:min-h-[54px] tracking-[0.03em] rounded-2xl;
+    @apply flex-1 min-w-0 justify-center text-[0.93rem] sm:text-[0.97rem] px-4 sm:px-5 py-3.5 min-h-[50px] sm:min-h-[52px] tracking-[0.03em] rounded-xl;
   }
 
   /** Primär sektion med mörk bakgrund — ljus fylld CTA */
   .btn-solid-light {
-    @apply inline-flex items-center justify-center gap-2.5 rounded-2xl font-semibold tracking-[0.03em]
+    @apply inline-flex items-center justify-center gap-2.5 rounded-xl font-semibold tracking-[0.03em]
            bg-[linear-gradient(135deg,rgba(255,255,255,1),rgba(245,244,238,0.98))]
            text-primary border border-white/70
            shadow-[0_1px_0_rgba(255,255,255,0.95)_inset,0_18px_34px_-20px_rgba(0,0,0,0.58)]
@@ -210,13 +211,13 @@
            hover:shadow-[0_24px_46px_-22px_rgba(0,0,0,0.66)] hover:-translate-y-1
            active:opacity-[0.93]
            transition-[background-color,box-shadow,opacity,transform,filter,border-color] duration-200 ease-out
-           text-[0.98rem] md:text-[1.08rem] px-9 md:px-11 py-4 md:py-[1.1rem] min-h-[56px] md:min-h-[60px]
+           text-[0.96rem] md:text-[1.04rem] px-8 md:px-10 py-3.5 md:py-4 min-h-[54px] md:min-h-[58px]
            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary;
   }
 
   /** Primär sektion — kontur mot ljus text */
   .btn-outline-light {
-    @apply inline-flex items-center justify-center gap-2.5 rounded-2xl font-semibold tracking-[0.03em]
+    @apply inline-flex items-center justify-center gap-2.5 rounded-xl font-semibold tracking-[0.03em]
            bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.01))]
            text-primary-foreground border border-white/55
            shadow-[0_1px_0_rgba(255,255,255,0.22)_inset,0_10px_24px_-18px_rgba(0,0,0,0.6)]
@@ -224,8 +225,25 @@
            hover:shadow-[0_16px_34px_-16px_rgba(0,0,0,0.58)]
            active:opacity-[0.93]
            transition-[background-color,border-color,box-shadow,opacity,transform] duration-200 ease-out
-           text-[0.98rem] md:text-[1.08rem] px-9 md:px-11 py-4 md:py-[1.1rem] min-h-[56px] md:min-h-[60px]
+           text-[0.96rem] md:text-[1.04rem] px-8 md:px-10 py-3.5 md:py-4 min-h-[54px] md:min-h-[58px]
            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/55 focus-visible:ring-offset-2 focus-visible:ring-offset-primary;
+  }
+
+  .page-shell {
+    @apply py-8 sm:py-10 md:py-14;
+    min-height: calc(100svh - 8.5rem);
+  }
+
+  .page-hero {
+    @apply border-b border-border/75 bg-surface;
+  }
+
+  .page-flow-link {
+    @apply inline-flex items-center justify-center rounded-xl border border-border/75 bg-card px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-primary/35 hover:text-primary;
+  }
+
+  .page-flow-chip {
+    @apply inline-flex items-center rounded-full border border-border/70 bg-background px-3 py-1 text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground;
   }
 
   .btn-icon-header {

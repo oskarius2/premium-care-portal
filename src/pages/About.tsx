@@ -5,6 +5,7 @@ import { siteContact } from "@/config/siteContact";
 import interior from "@/assets/about/about-clinic.png";
 import consultationNook from "@/assets/clinic/about-consult-nook.png";
 import { Ornament } from "@/components/ui/Ornament";
+import PageFlowNav from "@/components/layout/PageFlowNav";
 
 const expectations = [
   {
@@ -158,6 +159,10 @@ const About = () => {
             loading="lazy"
             decoding="async"
           />
+        </div>
+
+        <div className="container-wide">
+          <PageFlowNav currentPath="/om" />
         </div>
       </section>
     </>

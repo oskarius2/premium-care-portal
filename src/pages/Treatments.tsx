@@ -3,6 +3,7 @@ import { ArrowUpRight, Check, Calendar, Sparkles } from "lucide-react";
 import { treatments } from "@/data/treatments";
 import { siteBookingNotice, siteMedicalDisclaimer } from "@/config/siteBrand";
 import { Ornament } from "@/components/ui/Ornament";
+import PageFlowNav from "@/components/layout/PageFlowNav";
 
 const Treatments = () => {
   return (
@@ -158,6 +159,8 @@ const Treatments = () => {
               Behandling kan planeras först efter 48 timmars betänketid.
             </p>
           </div>
+
+          <PageFlowNav currentPath="/behandlingar" />
         </div>
       </section>
     </>

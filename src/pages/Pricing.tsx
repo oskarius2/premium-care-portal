@@ -3,6 +3,7 @@ import { Calendar, Clock } from "lucide-react";
 import { treatments } from "@/data/treatments";
 import { siteBookingNotice, siteMedicalDisclaimer } from "@/config/siteBrand";
 import { Ornament } from "@/components/ui/Ornament";
+import PageFlowNav from "@/components/layout/PageFlowNav";
 
 const Pricing = () => {
   return (
@@ -75,6 +76,8 @@ const Pricing = () => {
               <Calendar size={20} strokeWidth={1.75} /> Boka konsultation
             </Link>
           </div>
+
+          <PageFlowNav currentPath="/priser" />
         </div>
       </section>
     </>

@@ -4,6 +4,7 @@ import { siteBookingNotice, siteBrand, siteMedicalDisclaimer } from "@/config/si
 import { siteContact } from "@/config/siteContact";
 import { TelSurfaceLink, MailSurfaceLink } from "@/components/ContactAnchors";
 import { Ornament } from "@/components/ui/Ornament";
+import PageFlowNav from "@/components/layout/PageFlowNav";
 
 const Contact = () => {
   const hasPhone = Boolean(siteContact.phoneDisplay.trim() && siteContact.phoneTel);
@@ -186,6 +187,12 @@ const Contact = () => {
               </p>
             </div>
           )}
+        </div>
+      </section>
+
+      <section className="section-y-sm">
+        <div className="container-wide">
+          <PageFlowNav currentPath="/kontakt" />
         </div>
       </section>
     </>
