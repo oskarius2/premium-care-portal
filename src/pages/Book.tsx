@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import { sv } from "date-fns/locale";
-import { format as formatDate } from "date-fns";
+import { format as formatDate, addHours, startOfDay } from "date-fns";
 import "react-day-picker/dist/style.css";
 import { treatments, type Treatment } from "@/data/treatments";
 import { siteContact } from "@/config/siteContact";
@@ -31,6 +31,9 @@ import { TelLink } from "@/components/ContactAnchors";
  * kvällen kan få datumet "6 maj" eller "8 maj" skickat till backend.
  */
 const toLocalDateStr = (d: Date): string => formatDate(d, "yyyy-MM-dd");
+
+/** Swedish law: 48 h reflection period for aesthetic treatments. */
+const BETANKETID_HOURS = 48;
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -103,20 +106,30 @@ export default function Book() {
   const next = () => go(STEP_ORDER[stepIndex + 1]);
   const prev = () => go(STEP_ORDER[stepIndex - 1]);
 
+  const earliest48h = useMemo(() => addHours(new Date(), BETANKETID_HOURS), []);
+  const minBookableDate = useMemo(() => startOfDay(earliest48h), [earliest48h]);
+
   const selectedTreatment = useMemo(
     () => treatments.find((t) => t.slug === state.treatmentSlug),
     [state.treatmentSlug]
   );
 
   const groupedSlots = useMemo(() => {
+    const cutoff = addHours(new Date(), BETANKETID_HOURS);
     const morning: string[] = [];
     const afternoon: string[] = [];
     for (const s of slots) {
       const h = parseInt(s.split(":")[0] ?? "0", 10);
+      const m = parseInt(s.split(":")[1] ?? "0", 10);
+      if (state.date) {
+        const slotDt = new Date(state.date);
+        slotDt.setHours(h, m, 0, 0);
+        if (slotDt < cutoff) continue;
+      }
       (h < 12 ? morning : afternoon).push(s);
     }
     return { morning, afternoon };
-  }, [slots]);
+  }, [slots, state.date]);
 
   const fetchTreatmentId = async (slug: string): Promise<string> => {
     if (dbTreatments.length === 0) {
@@ -320,6 +333,14 @@ export default function Book() {
                   selectedTreatment ? ` · ${selectedTreatment.duration.toLowerCase()}` : ""
                 }`}
               >
+                <div className="flex items-start gap-3 bg-primary/5 border border-primary/20 rounded-xl p-4 mb-4">
+                  <ShieldCheck size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Enligt svensk lag gäller <strong className="text-foreground">48 timmars betänketid</strong> för
+                    estetiska behandlingar. Tidigaste möjliga bokningsdag
+                    är <strong className="text-foreground">{formatShortDate(minBookableDate)}</strong>.
+                  </p>
+                </div>
                 <div className="bg-card rounded-2xl border border-border shadow-[var(--shadow-card)] p-3 sm:p-6">
                   <DayPicker
                     mode="single"
@@ -327,7 +348,7 @@ export default function Book() {
                     weekStartsOn={1}
                     selected={state.date}
                     onSelect={(d) => d && selectDate(d)}
-                    disabled={{ before: new Date() }}
+                    disabled={{ before: minBookableDate }}
                     showOutsideDays
                     className="!m-0"
                     classNames={{
