@@ -17,11 +17,19 @@ const Admin            = lazy(() => import("./pages/Admin.tsx"));
 const AdminAuth        = lazy(() => import("./pages/AdminAuth.tsx"));
 const NotFound         = lazy(() => import("./pages/NotFound.tsx"));
 
+const PageFallback = () => (
+  <div className="min-h-[50svh] bg-background flex items-center justify-center px-6">
+    <div className="panel px-5 py-4 text-center">
+      <p className="eyebrow text-primary/80">Laddar sida</p>
+    </div>
+  </div>
+);
+
 const App = () => (
   <>
     <Toaster />
     <BrowserRouter>
-      <Suspense fallback={null}>
+      <Suspense fallback={<PageFallback />}>
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<Index />} />
