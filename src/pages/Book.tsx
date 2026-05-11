@@ -274,7 +274,7 @@ export default function Book() {
   }
 
   return (
-    <section className="py-8 md:py-14">
+    <section className="page-section">
       <div className="container-page">
         {/* Sidhuvud */}
         <div className="max-w-2xl mb-8 md:mb-12">
@@ -814,7 +814,7 @@ function Confirmation({
   treatment: Treatment | undefined;
 }) {
   return (
-    <section className="py-12 md:py-20">
+    <section className="page-section">
       <div className="container-page max-w-3xl">
         <div className="text-center mb-10">
           <span

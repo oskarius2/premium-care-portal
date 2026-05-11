@@ -7,7 +7,7 @@ import { Ornament } from "@/components/ui/Ornament";
 const Treatments = () => {
   return (
     <>
-      <section className="bg-surface section-y-sm border-b border-border/75 overflow-hidden">
+      <section className="page-hero overflow-hidden">
         <div className="container-wide max-w-4xl mx-auto text-center flex flex-col items-center relative">
           <span className="eyebrow">Behandlingar</span>
           <Ornament
@@ -61,7 +61,7 @@ const Treatments = () => {
         </div>
       </section>
 
-      <section className="section-y-sm">
+      <section className="page-section">
         <div className="container-wide">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 md:gap-8 lg:gap-10 max-w-6xl mx-auto">
             {treatments.map((t) => (

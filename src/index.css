@@ -7,10 +7,10 @@
 
 @layer base {
   :root {
-    --background: 44 30% 97%;
-    --foreground: 94 10% 24%;
+    --background: 44 32% 97%;
+    --foreground: 96 13% 20%;
 
-    --surface: 44 24% 94%;
+    --surface: 44 27% 94%;
     --surface-elevated: 0 0% 100%;
 
     --card: 0 0% 100%;
@@ -32,20 +32,20 @@
     --secondary: 42 20% 91%;
     --secondary-foreground: 94 10% 24%;
 
-    --muted: 44 20% 93%;
-    --muted-foreground: 94 8% 42%;
+    --muted: 44 22% 92%;
+    --muted-foreground: 96 9% 36%;
 
     --destructive: 0 55% 40%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 44 15% 84%;
-    --input: 44 15% 84%;
+    --border: 44 16% 82%;
+    --input: 44 16% 82%;
     --ring: 96 20% 40%;
 
     --radius: 0.75rem;
 
-    --shadow-card: 0 1px 0 hsl(94 10% 24% / 0.05), 0 1px 14px hsl(94 10% 24% / 0.05);
-    --shadow-lift: 0 1px 0 hsl(94 10% 24% / 0.06), 0 12px 34px hsl(94 10% 24% / 0.09);
+    --shadow-card: 0 1px 0 hsl(94 10% 24% / 0.05), 0 10px 34px -28px hsl(94 10% 24% / 0.38);
+    --shadow-lift: 0 1px 0 hsl(94 10% 24% / 0.06), 0 18px 42px -26px hsl(94 10% 24% / 0.48);
   }
 }
 
@@ -63,8 +63,8 @@
     font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
     font-feature-settings: "kern" 1;
     font-size: 16px;
-    line-height: 1.65;
-    letter-spacing: -0.011em;
+    line-height: 1.6;
+    letter-spacing: -0.006em;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     /* Förhindra horisontell scroll på små skärmar pga av decorativa absolute-element. */
@@ -76,7 +76,7 @@
   }
 
   @media (min-width: 768px) {
-    body { font-size: 17px; letter-spacing: -0.013em; }
+    body { font-size: 17px; letter-spacing: -0.008em; }
   }
 
   h1, h2, h3, h4 {
@@ -112,20 +112,40 @@
   }
 
   .section-y {
-    @apply py-14 sm:py-20 md:py-28 lg:py-40;
+    @apply py-14 sm:py-16 md:py-24 lg:py-28;
   }
 
   .section-y-sm {
-    @apply py-12 sm:py-16 md:py-24 lg:py-28;
+    @apply py-12 sm:py-14 md:py-20 lg:py-20;
   }
 
   .hairline {
     @apply border-0 border-t border-border/70;
   }
 
+  .page-hero {
+    @apply bg-surface border-b border-border/75 py-12 sm:py-14 md:py-20 lg:py-20;
+  }
+
+  .page-section {
+    @apply py-12 sm:py-14 md:py-20 lg:py-20;
+  }
+
+  @screen lg {
+    .page-hero,
+    .page-section {
+      min-height: calc(100svh - 6rem);
+      @apply flex items-center;
+    }
+  }
+
   /** Upphöjd yta — samma DNA som kort, bokningspaneler m.m. */
   .panel {
     @apply bg-card rounded-2xl border border-border/90 shadow-[var(--shadow-card)];
+  }
+
+  .surface-card {
+    @apply rounded-[1.5rem] border border-border/80 bg-card shadow-[var(--shadow-card)];
   }
 
   /** Ikonring — salvia/beige, alltid samma proportioner */
@@ -155,15 +175,15 @@
     @apply gap-px bg-border/45 border border-border/65 rounded-2xl overflow-hidden;
   }
 
-  /* Knappar — statement: mer identitet, mer djup, tydlig premium-signatur */
+  /* Knappar — tydliga pill-CTAs med lugn klinisk premium-känsla. */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-2xl
-           bg-[linear-gradient(135deg,hsl(96_24%_40%)_0%,hsl(96_18%_33%)_48%,hsl(97_18%_26%)_100%)]
-           text-primary-foreground font-semibold text-[0.97rem] tracking-[0.035em]
+    @apply inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full
+           bg-[linear-gradient(135deg,hsl(96_22%_39%)_0%,hsl(96_18%_32%)_56%,hsl(97_18%_26%)_100%)]
+           text-primary-foreground font-semibold text-[0.97rem] tracking-[0.01em]
            border border-[hsl(97_20%_24%/0.62)]
-           shadow-[0_1px_0_rgba(255,255,255,0.15)_inset,0_18px_36px_-20px_rgba(50,63,44,0.62),0_10px_24px_-18px_rgba(50,63,44,0.7)]
-           hover:shadow-[0_1px_0_rgba(255,255,255,0.24)_inset,0_24px_44px_-20px_rgba(50,63,44,0.72),0_14px_32px_-20px_rgba(50,63,44,0.82)]
-           hover:-translate-y-1 hover:brightness-110
+           shadow-[0_1px_0_rgba(255,255,255,0.18)_inset,0_18px_36px_-24px_rgba(50,63,44,0.78)]
+           hover:shadow-[0_1px_0_rgba(255,255,255,0.28)_inset,0_24px_46px_-24px_rgba(50,63,44,0.88)]
+           hover:-translate-y-0.5 hover:brightness-110
            active:translate-y-0 active:brightness-100 active:opacity-[0.95]
            disabled:pointer-events-none disabled:opacity-50
            transition-[box-shadow,opacity,transform,filter] duration-200 ease-out
@@ -172,11 +192,11 @@
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-2xl
-           bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(255,255,255,0.92))]
-           text-foreground font-semibold text-[0.97rem] tracking-[0.03em]
+    @apply inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full
+           bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(252,250,244,0.94))]
+           text-foreground font-semibold text-[0.97rem] tracking-[0.005em]
            border border-[hsl(var(--foreground)/0.18)]
-           shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_12px_26px_-22px_rgba(50,63,44,0.45)]
+           shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_14px_30px_-24px_rgba(50,63,44,0.5)]
            hover:border-[hsl(var(--foreground)/0.34)] hover:bg-[linear-gradient(180deg,rgba(255,255,255,1),rgba(245,244,238,0.98))]
            hover:-translate-y-0.5 hover:shadow-[0_16px_30px_-20px_rgba(50,63,44,0.55)]
            active:translate-y-0 active:opacity-[0.95]
@@ -192,12 +212,12 @@
 
   /** Header / verktygsrad — något tätare än standard */
   .btn-compact {
-    @apply text-[0.78rem] sm:text-[0.8125rem] md:text-sm px-4 sm:px-6 py-2.5 min-h-[44px] md:min-h-[46px] md:px-7 md:py-2.5 tracking-[0.03em] rounded-2xl;
+    @apply text-[0.78rem] sm:text-[0.8125rem] md:text-sm px-4 sm:px-6 py-2.5 min-h-[44px] md:min-h-[46px] md:px-7 md:py-2.5 tracking-[0.01em] rounded-full;
   }
 
   /** Två knappar bredvid varandra i kort (behandlingslista) */
   .btn-card-pair {
-    @apply flex-1 min-w-0 justify-center text-[0.93rem] sm:text-[0.97rem] px-4 sm:px-5 py-3.5 min-h-[52px] sm:min-h-[54px] tracking-[0.03em] rounded-2xl;
+    @apply flex-1 min-w-0 justify-center text-[0.93rem] sm:text-[0.97rem] px-4 sm:px-5 py-3.5 min-h-[52px] sm:min-h-[54px] tracking-[0.005em] rounded-full;
   }
 
   /** Primär sektion med mörk bakgrund — ljus fylld CTA */
@@ -259,11 +279,11 @@
   }
 
   .heading-xl {
-    @apply font-serif text-[2.05rem] xs:text-[2.35rem] sm:text-5xl md:text-6xl lg:text-7xl font-medium leading-[1.1] sm:leading-[1.05] tracking-tight;
+    @apply font-serif text-[2.05rem] xs:text-[2.35rem] sm:text-5xl md:text-6xl lg:text-[4.25rem] font-medium leading-[1.1] sm:leading-[1.05] tracking-tight;
   }
 
   .heading-lg {
-    @apply font-serif text-[1.7rem] xs:text-[1.9rem] sm:text-4xl md:text-5xl font-medium leading-[1.18] sm:leading-[1.12] md:leading-[1.15] tracking-tight;
+    @apply font-serif text-[1.7rem] xs:text-[1.9rem] sm:text-4xl md:text-[2.85rem] font-medium leading-[1.18] sm:leading-[1.12] md:leading-[1.15] tracking-tight;
   }
 
   .heading-md {
@@ -271,7 +291,7 @@
   }
 
   .lead {
-    @apply text-[0.975rem] sm:text-lg md:text-[1.125rem] text-muted-foreground leading-relaxed font-normal;
+    @apply text-[0.975rem] sm:text-lg md:text-[1.08rem] text-muted-foreground leading-relaxed font-normal;
   }
 
   .eyebrow {

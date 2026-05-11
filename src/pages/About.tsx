@@ -25,7 +25,7 @@ const About = () => {
   return (
     <>
       {/* HERO */}
-      <section className="bg-surface section-y-sm border-b border-border/75">
+      <section className="page-hero">
         <div className="container-wide max-w-3xl">
           <span className="eyebrow">Om oss</span>
 
@@ -49,7 +49,7 @@ const About = () => {
       </section>
 
       {/* OMSTÄLLNING — bild + text */}
-      <section className="section-y-sm">
+      <section className="page-section">
         <div className="container-wide grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
           <div className="lg:col-span-7 order-2 lg:order-1">
             <img
@@ -89,7 +89,7 @@ const About = () => {
       </section>
 
       {/* DET HÄR KAN DU FÖRVÄNTA DIG — editorial 3-list, inga box-cards */}
-      <section className="section-y-sm bg-surface border-y border-border/75">
+      <section className="page-section bg-surface border-y border-border/75">
         <div className="container-wide">
           <div className="flex flex-col items-center text-center mb-12 md:mb-16 gap-5">
             <span className="eyebrow">Förväntan</span>
@@ -128,7 +128,7 @@ const About = () => {
       </section>
 
       {/* ORD FRÅN VERKSAMHETEN */}
-      <section className="section-y-sm">
+      <section className="page-section">
         <div className="container-wide grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
           <div className="lg:col-span-6 order-2 lg:order-1">
             <span className="eyebrow">Ord från verksamheten</span>

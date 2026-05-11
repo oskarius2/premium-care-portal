@@ -15,8 +15,8 @@ const Footer = () => {
   );
 
   return (
-    <footer className="bg-surface border-t border-border/75 mt-24">
-      <div className="container-wide py-14 md:py-20 grid gap-12 md:grid-cols-3">
+    <footer className="bg-surface border-t border-border/75">
+      <div className="container-wide py-12 md:py-14 grid gap-10 md:grid-cols-3">
         <div className="md:pr-8">
           <p className="font-serif text-[1.65rem] sm:text-4xl leading-tight tracking-tight text-primary mb-1">
             {siteBrand.name}
@@ -103,10 +103,10 @@ const Footer = () => {
             </p>
           )}
 
-          <Link to="/boka" className="btn-primary mt-7 w-full">
+          <Link to="/boka" className="btn-primary mt-6 w-full">
             Boka konsultation
           </Link>
-          <p className="text-xs text-muted-foreground leading-relaxed mt-4">
+          <p className="text-xs text-muted-foreground leading-relaxed mt-3">
             {siteBookingNotice}
           </p>
         </div>
@@ -114,7 +114,7 @@ const Footer = () => {
 
       <div className="border-t border-border/75">
         <div className="container-wide py-7 flex flex-col items-center gap-3">
-          <Ornament className="text-foreground/25" width={84} glyph="diamond" />
+          <Ornament className="text-foreground/25" width={72} glyph="diamond" />
           <p className="text-xs text-muted-foreground text-center tracking-wide">
             © {new Date().getFullYear()} {siteBrand.name} · Alla rättigheter förbehållna
           </p>
