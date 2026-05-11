@@ -11,7 +11,7 @@ const TreatmentDetail = () => {
   if (!t) return <Navigate to="/behandlingar" replace />;
 
   return (
-    <article className="section-y-sm">
+    <article className="page-section">
       <div className="container-wide">
         <Link
           to="/behandlingar"

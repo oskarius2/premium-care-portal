@@ -16,7 +16,7 @@ const Contact = () => {
 
   return (
     <>
-      <section className="bg-surface section-y-sm border-b border-border/75">
+      <section className="page-hero">
         <div className="container-wide max-w-3xl mx-auto text-center flex flex-col items-center">
           <span className="eyebrow">Kontakt</span>
           <Ornament
@@ -40,7 +40,7 @@ const Contact = () => {
         </div>
       </section>
 
-      <section className="section-y-sm">
+      <section className="page-section">
         <div className="container-wide">
           <div className="grid grid-cols-1 md:grid-cols-2 grid-divided max-w-5xl mx-auto">
             {hasPhone ? (

@@ -12,19 +12,19 @@ const tabs = [
 const MobileNav = () => {
   return (
     <nav
-      className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85 border-t border-border/75"
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/96 backdrop-blur supports-[backdrop-filter]:bg-background/88 border-t border-border/75 shadow-[0_-18px_38px_-32px_rgba(50,63,44,0.46)]"
       aria-label="Mobilnavigation"
     >
-      <div className="flex items-stretch justify-around h-16 px-1 safe-area-pb">
+      <div className="flex items-stretch justify-around h-16 px-1.5 safe-area-pb">
         {tabs.map((tab) => (
           <NavLink
             key={tab.to}
             to={tab.to}
             end={tab.to === "/"}
             className={({ isActive }) =>
-              `flex flex-col items-center justify-center gap-0.5 flex-1 min-w-0 py-1.5 transition-colors ${
+              `flex flex-col items-center justify-center gap-0.5 flex-1 min-w-0 my-1 rounded-2xl transition-[background-color,color] ${
                 isActive
-                  ? "text-primary"
+                  ? "bg-accent-soft text-primary"
                   : "text-foreground/50 active:text-foreground/70"
               }`
             }

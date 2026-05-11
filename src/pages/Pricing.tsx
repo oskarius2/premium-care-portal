@@ -8,7 +8,7 @@ const Pricing = () => {
   return (
     <>
       {/* HERO */}
-      <section className="bg-surface section-y-sm border-b border-border/75">
+      <section className="page-hero">
         <div className="container-wide max-w-3xl mx-auto text-center flex flex-col items-center">
           <span className="eyebrow">Prislista</span>
 
@@ -28,7 +28,7 @@ const Pricing = () => {
       </section>
 
       {/* PRISLISTA */}
-      <section className="section-y-sm">
+      <section className="page-section">
         <div className="container-wide max-w-3xl mx-auto">
           <p className="text-[0.7rem] uppercase tracking-[0.16em] text-muted-foreground mb-6">
             Behandlingar

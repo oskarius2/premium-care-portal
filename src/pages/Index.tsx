@@ -30,16 +30,22 @@ const signaturePillars = [
     icon: Stethoscope,
     title: "Medicinsk kompetens",
     body: "Bedömning, behandling och uppföljning hålls samman i samma kliniska flöde — utan att det känns kallt eller opersonligt.",
+    to: "/om",
+    cta: "Läs om kliniken",
   },
   {
     icon: ScanLine,
     title: "Naturlig strategi",
     body: "Fokus ligger på hudkvalitet, struktur och harmoni över tid, inte på snabba eller överdrivna förändringar.",
+    to: "/behandlingar",
+    cta: "Se behandlingar",
   },
   {
     icon: ShieldCheck,
     title: "Trygg process",
     body: "Indikationer, risker, eftervård och förväntningar förklaras tydligt innan något görs — aldrig efteråt.",
+    to: "/boka",
+    cta: "Boka konsultation",
   },
 ];
 
@@ -95,7 +101,7 @@ const Index = () => {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-border/75 min-h-[min(72vh,42rem)]">
+      <section className="relative overflow-hidden border-b border-border/75 min-h-[calc(100svh-3.5rem)] lg:min-h-[calc(100svh-5rem)] flex items-center">
         <div className="absolute inset-0 z-0">
           <HeroMedia variant="background" posterSrc={heroImg} alt="" />
         </div>
@@ -110,7 +116,7 @@ const Index = () => {
           aria-hidden
         />
 
-        <div className="container-wide relative z-10 pt-6 sm:pt-10 md:pt-14 lg:pt-16 pb-10 sm:pb-12 md:pb-16 lg:pb-20">
+        <div className="container-wide relative z-10 py-8 sm:py-10 md:py-12 lg:py-14">
           <div className="fade-up max-w-[40rem]">
             <div className="rounded-[1.75rem] border border-border/60 bg-background/88 backdrop-blur-md px-5 py-6 sm:px-7 sm:py-8 shadow-[var(--shadow-card)]">
               <ul className="hidden md:flex items-center gap-5 mb-8 flex-wrap">
@@ -200,11 +206,31 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="bg-background border-b border-border/75">
-        <div className="container-wide py-10 sm:py-12 md:py-14">
+      <section className="page-section bg-background border-b border-border/75">
+        <div className="container-wide">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5 mb-7 sm:mb-9">
+            <div className="max-w-2xl">
+              <span className="eyebrow">Välj nästa steg</span>
+              <h2 className="heading-lg mt-3 text-balance">
+                Klicka dig vidare{" "}
+                <em className="font-serif italic font-normal text-primary/85">
+                  sida för sida.
+                </em>
+              </h2>
+            </div>
+            <p className="text-muted-foreground text-[0.96rem] leading-relaxed max-w-md">
+              Startsidan sammanfattar riktningen. För detaljer går du vidare till rätt sida:
+              behandlingar, kliniken eller bokning.
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-px grid-divided">
-            {signaturePillars.map(({ icon: Icon, title, body }) => (
-              <div key={title} className="bg-background p-6 sm:p-7 md:p-8 lg:p-9 flex flex-col gap-4 sm:gap-5">
+            {signaturePillars.map(({ icon: Icon, title, body, to, cta }) => (
+              <Link
+                to={to}
+                key={title}
+                className="group bg-background p-6 sm:p-7 md:p-8 lg:p-9 flex flex-col gap-4 sm:gap-5 transition-colors hover:bg-card"
+              >
                 <span className="icon-circle-md">
                   <Icon size={22} strokeWidth={1.75} />
                 </span>
@@ -216,13 +242,16 @@ const Index = () => {
                     {body}
                   </p>
                 </div>
-              </div>
+                <span className="mt-auto inline-flex items-center gap-2 text-sm font-semibold text-primary group-hover:text-accent-deep">
+                  {cta} <ArrowUpRight size={16} strokeWidth={1.75} />
+                </span>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="section-y-sm">
+      <section className="page-section">
         <div className="container-wide">
           <SectionHeader
             eyebrow="Våra behandlingar"
@@ -293,71 +322,73 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="section-y-sm bg-surface border-y border-border/75">
+      <section className="page-section bg-surface border-y border-border/75">
         <div className="container-wide">
           <SectionHeader
             eyebrow="Så går det till"
             title="Från första kontakt"
-            accent="till uppföljning"
-            lead="Varje besök följer samma struktur — så att du vet vad som händer, varför det görs och vad du kan förvänta dig efteråt."
+            accent="till svaren du behöver"
+            lead="Processen och de vanligaste frågorna ligger samlat, så du snabbt kan välja om nästa steg är att läsa vidare eller boka konsultation."
             align="center"
-            className="mb-10 sm:mb-14 md:mb-20 mx-auto"
+            className="mb-8 sm:mb-10 md:mb-12 mx-auto"
           />
 
-          <ol className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
-            {processSteps.map((step) => (
-              <li
-                key={step.n}
-                className="panel p-6 sm:p-7 md:p-8 lg:p-9 flex flex-col min-h-full"
-              >
-                <div className="flex items-baseline gap-3 sm:gap-4 mb-4 sm:mb-6">
-                  <span className="font-serif italic text-[2.1rem] sm:text-[2.5rem] lg:text-[3rem] leading-none text-primary/80 select-none">
-                    {step.n}
-                  </span>
-                  <span className="hairline flex-1" />
-                </div>
-                <h3 className="font-serif text-[1.4rem] sm:text-2xl leading-snug tracking-tight text-foreground mb-2 sm:mb-3">
-                  {step.title}
-                </h3>
-                <p className="text-muted-foreground text-[0.92rem] sm:text-[0.95rem] leading-relaxed">
-                  {step.body}
-                </p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <section className="section-y-sm">
-        <div className="container-wide">
-          <SectionHeader
-            eyebrow="Vanliga frågor"
-            title="Det du brukar"
-            accent="undra över först"
-            lead="Korta, raka svar på det de flesta tänker innan de bokar. Resten går vi igenom tillsammans i konsultationen."
-            align="center"
-            className="mb-10 sm:mb-14 md:mb-20 mx-auto"
-          />
-
-          <div className="max-w-3xl mx-auto">
-            <dl className="border-t border-border/75">
-              {faqs.map((f) => (
-                <div key={f.q} className="border-b border-border/75 py-4 sm:py-5 md:py-6">
-                  <dt className="font-serif text-[1.05rem] sm:text-[1.125rem] md:italic md:text-[1.375rem] text-foreground leading-snug mb-2 sm:mb-2.5 md:mb-3 text-balance">
-                    {f.q}
-                  </dt>
-                  <dd className="text-muted-foreground text-[0.92rem] sm:text-[0.95rem] md:text-base leading-relaxed">
-                    {f.a}
-                  </dd>
-                </div>
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.08fr)_minmax(22rem,0.92fr)] gap-6 lg:gap-8 items-start">
+            <ol className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+              {processSteps.map((step) => (
+                <li
+                  key={step.n}
+                  className="panel p-5 sm:p-6 flex flex-col min-h-full"
+                >
+                  <div className="flex items-baseline gap-3 mb-4">
+                    <span className="font-serif italic text-[2rem] sm:text-[2.35rem] leading-none text-primary/80 select-none">
+                      {step.n}
+                    </span>
+                    <span className="hairline flex-1" />
+                  </div>
+                  <h3 className="font-serif text-[1.3rem] sm:text-[1.55rem] leading-snug tracking-tight text-foreground mb-2 text-balance">
+                    {step.title}
+                  </h3>
+                  <p className="text-muted-foreground text-[0.91rem] sm:text-[0.94rem] leading-relaxed">
+                    {step.body}
+                  </p>
+                </li>
               ))}
-            </dl>
+            </ol>
+
+            <div className="surface-card p-4 sm:p-5 md:p-6">
+              <div className="flex items-center justify-between gap-4 mb-3 sm:mb-4">
+                <div>
+                  <span className="eyebrow">Vanliga frågor</span>
+                  <h3 className="font-serif text-[1.45rem] sm:text-[1.7rem] leading-tight tracking-tight text-foreground mt-2">
+                    Snabba svar före bokning.
+                  </h3>
+                </div>
+                <Ornament className="text-foreground/25 shrink-0" width={52} glyph="diamond" />
+              </div>
+
+              <div className="divide-y divide-border/75">
+                {faqs.map((f, i) => (
+                  <details key={f.q} className="group py-3.5 sm:py-4" open={i === 0}>
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-serif text-[1.05rem] sm:text-[1.18rem] leading-snug tracking-tight text-foreground text-balance [&::-webkit-details-marker]:hidden">
+                      {f.q}
+                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-border text-primary transition-transform group-open:rotate-45">
+                        +
+                      </span>
+                    </summary>
+                    <p className="text-muted-foreground text-[0.91rem] sm:text-[0.95rem] leading-relaxed mt-3 pr-9">
+                      {f.a}
+                    </p>
+                  </details>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="bg-primary text-primary-foreground">
-        <div className="container-narrow text-center py-16 sm:py-20 md:py-28 lg:py-32 flex flex-col items-center">
+      <section className="page-section bg-primary text-primary-foreground">
+        <div className="container-narrow text-center flex flex-col items-center">
           <Ornament className="text-primary-foreground/40 mb-5 sm:mb-6" width={64} glyph="diamond" />
 
           <span className="text-[0.66rem] sm:text-[0.7rem] uppercase tracking-[0.22em] text-primary-foreground/70 mb-4 sm:mb-5">

@@ -36,7 +36,7 @@ export const SectionHeader = ({
   return (
     <div
       className={cn(
-        "flex flex-col gap-5",
+        "flex flex-col gap-4 sm:gap-5",
         isCenter ? "items-center text-center" : "items-start text-left",
         className,
       )}
@@ -69,7 +69,7 @@ export const SectionHeader = ({
       </h2>
 
       {lead && (
-        <p className="text-muted-foreground text-base md:text-[1.0625rem] leading-relaxed max-w-[58ch]">
+        <p className="text-muted-foreground text-base md:text-[1.04rem] leading-relaxed max-w-[56ch]">
           {lead}
         </p>
       )}
