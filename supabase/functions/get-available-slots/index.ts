@@ -27,9 +27,14 @@ Deno.serve(async (req) => {
       return json({ error: "1–3 treatment_ids required" }, 400);
     }
 
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? Deno.env.get("SERVICE_ROLE_KEY");
+    if (!serviceRoleKey) {
+      return json({ error: "Supabase service role key is not configured" }, 500);
+    }
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      serviceRoleKey
     );
 
     // Hämta alla efterfrågade behandlingar och summera duration
