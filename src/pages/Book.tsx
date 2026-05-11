@@ -38,6 +38,9 @@ const BETANKETID_HOURS = 48;
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const hasSupabaseConfig = Boolean(SUPABASE_URL?.trim() && SUPABASE_KEY?.trim());
+const SUPABASE_CONFIG_ERROR =
+  "Bokningssystemet saknar Supabase-konfiguration. Kontakta kliniken så hjälper vi dig att boka manuellt.";
 
 const fn = (name: string) => `${SUPABASE_URL}/functions/v1/${name}`;
 const headers = {
@@ -133,6 +136,8 @@ export default function Book() {
   }, [slots, state.date]);
 
   const fetchTreatmentId = async (slug: string): Promise<string> => {
+    if (!hasSupabaseConfig) return slug;
+
     if (dbTreatments.length === 0) {
       try {
         const res = await fetch(
@@ -182,6 +187,11 @@ export default function Book() {
    */
   const loadSlotsFor = async (date: Date, treatmentId: string) => {
     setSlots([]);
+    if (!hasSupabaseConfig) {
+      setError(SUPABASE_CONFIG_ERROR);
+      return false;
+    }
+
     setLoadingSlots(true);
     try {
       const dateStr = toLocalDateStr(date);
@@ -227,6 +237,11 @@ export default function Book() {
 
   const submit = async () => {
     if (!state.date) return;
+    if (!hasSupabaseConfig) {
+      setError(SUPABASE_CONFIG_ERROR);
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
     try {
@@ -388,6 +403,7 @@ export default function Book() {
                     }}
                   />
                 </div>
+                {error && <ErrorNotice message={error} className="mt-4" />}
                 <ActionBar onBack={prev} />
               </StepShell>
             )}
@@ -448,6 +464,7 @@ export default function Book() {
                     )}
                   </div>
                 )}
+                {error && <ErrorNotice message={error} className="mt-6" />}
                 <ActionBar onBack={prev} />
               </StepShell>
             )}
@@ -502,13 +519,7 @@ export default function Book() {
                   />
 
                   {error && (
-                    <div
-                      role="alert"
-                      className="flex items-start gap-3 bg-destructive/8 border border-destructive/30 text-destructive rounded-md p-4"
-                    >
-                      <AlertCircle size={18} className="mt-0.5 shrink-0" />
-                      <p className="text-sm font-medium leading-relaxed">{error}</p>
-                    </div>
+                    <ErrorNotice message={error} />
                   )}
 
                   <p className="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed pt-1">
@@ -554,6 +565,18 @@ export default function Book() {
 }
 
 /* --------------------------- Subcomponents --------------------------- */
+
+function ErrorNotice({ message, className = "" }: { message: string; className?: string }) {
+  return (
+    <div
+      role="alert"
+      className={`flex items-start gap-3 bg-destructive/8 border border-destructive/30 text-destructive rounded-md p-4 ${className}`}
+    >
+      <AlertCircle size={18} className="mt-0.5 shrink-0" />
+      <p className="text-sm font-medium leading-relaxed">{message}</p>
+    </div>
+  );
+}
 
 function Stepper({ stepIndex }: { stepIndex: number }) {
   return (
